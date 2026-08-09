@@ -49,7 +49,7 @@ Installation is simple and automated for Debian/Raspberry Pi OS-based systems (a
    ```
 3. Clone the repository:
    ```bash
-   git clone [https://github.com/casamia67/mymoode-MPD-client.git](https://github.com/casamia67/mymoode-MPD-client.git) vumeter
+   git clone https://github.com/casamia67/mymoode-MPD-client.git vumeter
    ```
 4. Enter the directory and run the installation script:
    ```bash
