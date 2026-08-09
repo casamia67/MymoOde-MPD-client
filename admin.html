@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="it" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pannello Amministratore - Mymoode Client</title>
+    
+    <link rel="stylesheet" href="bootstrap-icons/bootstrap-icons.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Ottimizzazione layout specifico per il pannello Admin */
+        body { 
+            display: block; 
+            overflow-y: auto; 
+            padding: clamp(1rem, 3vw, 3rem); 
+        }
+        .admin-container { 
+            max-width: 1000px; 
+            margin: 0 auto; 
+            position: relative; 
+            z-index: 2; 
+        }
+        .header-admin { 
+            text-align: center; 
+            margin-bottom: 2rem; 
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .header-admin h1 { margin-top: 0; color: #fff; display: flex; justify-content: center; align-items: center; gap: 15px;}
+        .header-admin p { color: #aaa; margin-bottom: 0; font-size: 1.1rem; }
+    </style>
+</head>
+<body class="theme-default">
+
+    <div id="dynamicBackground" style="background-image: radial-gradient(circle at 50% 30%, var(--hl-color) 0%, #000 80%); z-index: 0;"></div>
+    <div id="overlayGradient"></div>
+
+    <div class="admin-container">
+        
+        <div class="header-admin">
+            <h1><i class="bi bi-sliders"></i> Pannello di Servizio Globale</h1>
+            <p>Configura i valori iniziali che verranno assegnati automaticamente a qualsiasi nuovo dispositivo che apre l'interfaccia per la prima volta.</p>
+        </div>
+
+        <div class="settings-grid">
+            
+            <div class="settings-card" style="flex: 1 1 100%;">
+                <h3><i class="bi bi-palette"></i> Aspetto & Screensaver Predefiniti</h3>
+                
+                <label>Modello VU Meter Globale</label>
+                <select id="defVuStyle">
+                    <option value="blue_mod70">Blue Classic Mod. 70</option>
+                    <option value="blue_mono_mod1000">Blue Mono Mod. 1000</option>
+                    <option value="champagne_mod73">Champagne Gold Mod. 73</option>
+                    <option value="vfd_mod85">VFD Peak Mod. 85</option>
+                    <option value="vintage_mod60">Studio Vintage Mod. 60</option>
+                    <option value="waves_mod99">Waves Studio Mod. 99</option>
+                    <option value="studio_mod77">Studio Master Mod. 77</option>
+                    <option value="dark_meter_mod88">Dark Meter Mod. 88</option>
+                    <option value="british_mod90">British Console Mod. 90</option>
+                    <option value="light_meter_mod88">Light Meter Mod. 88</option>
+                    <option value="cyan_meter_mod88">Cyan Meter Mod. 88</option>
+                    <option value="neon_mod95">Neon Cyan Mod. 95</option>
+                    <option value="minimal_mod00">Minimal Dark Mod. 00</option>
+                    <option value="orange_mod70">Warm Orange Mod. 70</option>
+                    <option value="tube_mod50">Blue Tube Mod. 50</option>
+                    <option value="flat_mod00">Minimal Flat Mod. 00</option>
+                    <option value="touch_mod15">Touch VU Mod. 15</option>
+                    <option value="amber_mod75">Amber Classic Mod. 75</option>
+                </select>
+                
+                <label>Adattamento Schermo Predefinito</label>
+                <select id="defLayout">
+                    <option value="auto">Automatico</option>
+                    <option value="desktop">1920x1080 o sup.</option>
+                    <option value="laptop">1366x768 (Tablet Oriz.)</option>
+                    <option value="tablet">800x1280 (Tablet Vert.)</option>
+                    <option value="mobile">Smartphone</option>
+                </select>
+
+                <div style="display:flex; gap: 10px; margin-top: 10px;">
+                    <div style="flex: 1;">
+                        <label>Timeout Avvio Screensaver</label>
+                        <select id="defSsTimeout">
+                            <option value="0">Disattivato</option>
+                            <option value="1">Dopo 1 Minuto</option>
+                            <option value="5">Dopo 5 Minuti</option>
+                            <option value="15">Dopo 15 Minuti</option>
+                        </select>
+                    </div>
+                    <div style="flex: 1;">
+                        <label>Rotazione Stili Casuale</label>
+                        <select id="defSsRandom">
+                            <option value="0">Fissa (Nessuna rotazione)</option>
+                            <option value="0.5">Ogni 30 Sec.</option>
+                            <option value="1">Ogni 1 Min.</option>
+                            <option value="5">Ogni 5 Min.</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <label style="margin-top: 1.5rem;">Opzioni UI e Motore Grafico</label>
+                <div class="simple-switch-wrapper" style="margin-bottom: 0.5rem; padding: 6px 10px;">
+                    <span style="font-size: 12px; color: #fff;">VU Meter nel Player Integrato</span>
+                    <label class="simple-switch"><input type="checkbox" id="defInlineVu"><span class="slider"></span></label>
+                </div>
+                <div class="simple-switch-wrapper" style="margin-bottom: 0.5rem; padding: 6px 10px;">
+                    <span style="font-size: 12px; color: #fff;">Luce Pannello (Riflessi Vetro 3D)</span>
+                    <label class="simple-switch"><input type="checkbox" id="defBacklight"><span class="slider"></span></label>
+                </div>
+                <div class="simple-switch-wrapper" style="margin-bottom: 0.5rem; padding: 6px 10px;">
+                    <span style="font-size: 12px; color: #fff;">Analizzatore Audio Locale</span>
+                    <label class="simple-switch"><input type="checkbox" id="defLocalAnalyzer"><span class="slider"></span></label>
+                </div>
+                <div class="simple-switch-wrapper" style="margin-bottom: 0.5rem; padding: 6px 10px;">
+                    <span style="font-size: 12px; color: #fff;">Mantieni tema ruotato all'uscita dal Salvaschermo</span>
+                    <label class="simple-switch"><input type="checkbox" id="defKeepSsStyle"><span class="slider"></span></label>
+                </div>
+                <div class="simple-switch-wrapper" style="margin-bottom: 0.5rem; padding: 6px 10px;">
+                    <span style="font-size: 12px; color: #fff;">Mostra Mini Player nel Salvaschermo</span>
+                    <label class="simple-switch"><input type="checkbox" id="defMiniPlayerSs"><span class="slider"></span></label>
+                </div>
+            </div>
+
+            <div class="settings-card" style="flex: 1 1 100%;">
+                <h3><i class="bi bi-hdd-network"></i> Indirizzi di Rete e Integrazioni</h3>
+                <label>CamillaDSP WebSocket URI (Per l'elaborazione del segnale)</label>
+                <input type="text" id="defWsUri" placeholder="es. ws://192.168.1.50:1234">
+                <div class="hint" style="font-size: 0.75rem; color: #888; margin-top: 4px;">Lascia vuoto per far sì che il client auto-rilevi l'IP del server.</div>
+                
+                <label>URL Stream Locale (Per l'ascolto su smartphone/tablet)</label>
+                <input type="text" id="defStreamUrl" placeholder="es. http://192.168.1.50:8000/mpd.ogg">
+
+                <label style="margin-top: 1rem;">URL Interfaccia Ufficiale moOde Audio</label>
+                <input type="text" id="defMoodeUrl" placeholder="es. http://192.168.1.50">
+            </div>
+            
+        </div>
+        
+        <button class="btn-addplay" style="background: var(--hl-color); color: #000; padding: 18px; font-size: 1.2rem; font-weight: bold; margin-top: 2rem; width: 100%; border: none; box-shadow: 0 10px 20px rgba(0,0,0,0.5);" onclick="saveGlobalDefaults()">
+            <i class="bi bi-floppy-fill"></i> Salva e Applica Predefiniti
+        </button>
+        
+        <div style="text-align: center; margin-top: 1.5rem;">
+            <a href="index.html" style="color: #aaa; text-decoration: none; font-weight: bold; font-size: 1.1rem; transition: 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#aaa'">
+                <i class="bi bi-arrow-left-circle-fill" style="margin-right: 5px;"></i> Ritorna al Rack Hi-Fi
+            </a>
+        </div>
+    </div>
+
+    <!-- LOGICA JAVASCRIPT DEL PANNELLO ADMIN -->
+    <script>
+        const API = 'mpd_bridge.php';
+
+        async function loadGlobalDefaults() {
+            try {
+                let res = await fetch(`${API}?action=get_default_settings&_t=${Date.now()}`);
+                if (res.ok) {
+                    let d = await res.json();
+                    
+                    document.getElementById('defVuStyle').value = d.vuStyle || 'blue_mod70';
+                    document.getElementById('defLayout').value = d.deviceLayout || 'auto';
+                    document.getElementById('defSsTimeout').value = d.ssTimeout !== undefined ? d.ssTimeout : '1';
+                    document.getElementById('defSsRandom').value = d.ssRandom !== undefined ? d.ssRandom : '0.5';
+                    
+                    document.getElementById('defInlineVu').checked = d.inlineVu !== false;
+                    document.getElementById('defBacklight').checked = d.backlight !== false;
+                    document.getElementById('defLocalAnalyzer').checked = d.localAnalyzer !== false;
+                    document.getElementById('defKeepSsStyle').checked = d.keepSsStyle === true;
+                    document.getElementById('defMiniPlayerSs').checked = d.miniPlayerSs !== false;
+
+                    document.getElementById('defWsUri').value = d.wsUri || '';
+                    document.getElementById('defStreamUrl').value = d.streamUrl || '';
+                    document.getElementById('defMoodeUrl').value = d.moodeUrl || '';
+                }
+            } catch (e) {
+                console.error("Errore caricamento predefiniti globali", e);
+            }
+        }
+
+        async function saveGlobalDefaults() {
+            let payload = {
+                vuStyle: document.getElementById('defVuStyle').value,
+                deviceLayout: document.getElementById('defLayout').value,
+                ssTimeout: document.getElementById('defSsTimeout').value,
+                ssRandom: document.getElementById('defSsRandom').value,
+                inlineVu: document.getElementById('defInlineVu').checked,
+                backlight: document.getElementById('defBacklight').checked,
+                localAnalyzer: document.getElementById('defLocalAnalyzer').checked,
+                keepSsStyle: document.getElementById('defKeepSsStyle').checked,
+                miniPlayerSs: document.getElementById('defMiniPlayerSs').checked,
+                wsUri: document.getElementById('defWsUri').value.trim(),
+                streamUrl: document.getElementById('defStreamUrl').value.trim(),
+                moodeUrl: document.getElementById('defMoodeUrl').value.trim()
+            };
+
+            let btn = document.querySelector('button');
+            let originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Salvataggio...';
+            btn.style.opacity = '0.7';
+
+            try {
+                let res = await fetch(`${API}?action=set_default_settings`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (res.ok) {
+                    btn.innerHTML = '<i class="bi bi-check-circle-fill"></i> Predefiniti Salvati!';
+                    btn.style.background = '#198754';
+                    btn.style.color = '#fff';
+                    setTimeout(() => {
+                        btn.innerHTML = originalHtml;
+                        btn.style.background = 'var(--hl-color)';
+                        btn.style.color = '#000';
+                        btn.style.opacity = '1';
+                    }, 3000);
+                } else {
+                    alert("Si è verificato un errore durante il salvataggio sul server.");
+                    btn.innerHTML = originalHtml;
+                    btn.style.opacity = '1';
+                }
+            } catch (e) {
+                alert("Errore di rete. Impossibile contattare il Raspberry.");
+                console.error(e);
+                btn.innerHTML = originalHtml;
+                btn.style.opacity = '1';
+            }
+        }
+        window.onload = loadGlobalDefaults;
+    </script>
+</body>
+</html>
