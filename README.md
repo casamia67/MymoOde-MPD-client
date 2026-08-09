@@ -75,5 +75,8 @@ A special and heartfelt thank you to the **moOde Audio** team for the dedication
 * Music Player Daemon (MPD)
 * To the entire Open Source and DIYAudio community.
 
-{"[00:00]": "Heat heat", "[00:40]": "Heat heat", "[00:50]": "Heat", "[00:57]": "Heat", "[01:07]": "Heat heat", "[01:27]": "Heat heat", "[01:51]": "Heat heat", "[02:12]": "Heat heat", "[02:54]": "Heat heat", "[03:10]": "Hey hey hey hey hey hey hey hey hey hey hey Heat heat", "[04:07]": "Welcome home missing you made me stronger and I'd be Superman if I fly around the world it wouldn't take", "[04:18]": "Me longer then would you be your man i fight a thousand guys live to die a thousand lies oh", "[04:29]": "I'd find another way to make me smarter just so I could understand i'll find what you're looking for just", "[04:41]": "So I could understand", "[04:48]": "Just so I could understand", "[04:55]": "Just so I could understand", "[05:02]": "So I could understand", "[05:09]": "I could understand", "[05:16]": "What it takes to beat your clothes right off my back put the knife against my throat say you even", "[05:27]": "Won't come back but I'll find a way to forget you cut the strings off my guitar stomp your heels", "[05:37]": "Into my toes steal the keys right out my car and I'll find a way to forive you i fight", "[05:47]": "A thousand guys live to die a thousand lives"}
+## 📺 Video Demo
 
+Clicca sull'immagine qui sotto per vedere Mymoode MPD Client in azione:
+
+[![Mymoode MPD Client Demo](https://img.youtube.com/vi/0-T8ZMdwZG8/maxresdefault.jpg)](https://youtu.be/0-T8ZMdwZG8)
