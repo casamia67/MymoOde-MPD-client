@@ -1,4 +1,21 @@
 // --- CORE E VU METER CLASSICI ---
+let globalCustomLabels = {};
+
+function loadCustomLabels() {
+    try {
+        let parsed = JSON.parse(localStorage.getItem('customLabels'));
+        globalCustomLabels = (parsed && typeof parsed === 'object') ? parsed : {};
+    } catch (e) {
+        globalCustomLabels = {};
+    }
+}
+
+function getCustomLabel(modelKey, defaultName) {
+    return globalCustomLabels[modelKey] && globalCustomLabels[modelKey].trim() !== "" ? globalCustomLabels[modelKey] : defaultName;
+}
+
+window.addEventListener('load', loadCustomLabels);
+
 var idleTimer = null, randomStyleInterval = null, ssActive = false;
 var camillaWs = null, pollInterval = null;
 var smoothedL = 0, smoothedR = 0, smoothedSingle = 0;
@@ -258,7 +275,7 @@ function startScreensaver(force = false) {
 }
 
 // =========================================
-// GESTIONE EVENTI (PULITA E PRIVA DI CONFLITTI)
+// GESTIONE EVENTI
 // =========================================
 let ssControlsTimeout = null; 
 const ssOver = document.getElementById('screensaverOverlay');
@@ -458,6 +475,7 @@ function initScreensaverAndVU() {
     animationId = requestAnimationFrame(renderLoop);
 }
 
+// IL "PENNELLO" DEL CANVAS CON ETICHETTE DINAMICHE
 function renderFaceToCtx(ctx, style, w, h, backlight) {
     let scaleRatio = w / 440;
     if (style === 'blue_mono_mod1000') {
@@ -582,7 +600,7 @@ function renderFaceToCtx(ctx, style, w, h, backlight) {
             ctx.fillText(botV[i], cx + (radius + h*0.04) * Math.cos(Math.PI * botA[i]), cy + (radius + h*0.04) * Math.sin(Math.PI * botA[i])); 
         }
         ctx.font = `italic ${Math.round(22*scaleRatio)}px "Brush Script MT", cursive`; 
-        ctx.fillText("ClassicMeter", cx, h*0.88); 
+        ctx.fillText(getCustomLabel('light_meter_mod88', "ClassicMeter"), cx, h*0.88); 
         ctx.font = `${Math.round(10*scaleRatio)}px sans-serif`; 
         ctx.fillText("watts (8Ω)", cx, h*0.72); 
         ctx.fillText("dB", cx, h*0.78);
@@ -719,7 +737,7 @@ function renderFaceToCtx(ctx, style, w, h, backlight) {
             ctx.fillText(topV[i], cx + (radius - h*0.12) * Math.cos(Math.PI * topA[i]), cy + (radius - h*0.12) * Math.sin(Math.PI * topA[i])); 
         } 
         ctx.font = `italic ${Math.round(20*scaleRatio)}px "Brush Script MT", cursive`; 
-        ctx.fillText("ClassicMeter", cx, h*0.85); 
+        ctx.fillText(getCustomLabel('dark_meter_mod88', "ClassicMeter"), cx, h*0.85); 
         ctx.font = `bold ${Math.round(10*scaleRatio)}px sans-serif`; 
         ctx.fillText("POWER/WATTS 8 Ω", cx, h*0.25); 
         ctx.fillText("dB", cx, h*0.68);
@@ -878,7 +896,7 @@ function renderFaceToCtx(ctx, style, w, h, backlight) {
         ctx.save(); 
         ctx.font = `bold ${Math.round(13 * scaleRatio)}px "Times New Roman", serif`; 
         ctx.fillStyle = "#2b2416"; 
-        ctx.fillText("CHAMPAGNE", cx, h * 0.62); 
+        ctx.fillText(getCustomLabel('champagne_mod73', "CHAMPAGNE"), cx, h * 0.62); 
         ctx.font = `bold ${Math.round(14 * scaleRatio)}px sans-serif`; 
         ctx.fillText("VU", cx, h * 0.78); 
         ctx.restore();
@@ -927,12 +945,15 @@ function renderFaceToCtx(ctx, style, w, h, backlight) {
             ctx.fillText(vValues[i], x, y); 
         }
         ctx.save(); 
+        let custom77 = getCustomLabel('studio_mod77', "MASTER");
         ctx.font = `bold ${Math.round(14 * scaleRatio)}px sans-serif`; 
         ctx.fillStyle = "#00e676"; 
-        ctx.fillText("MASTER", cx, h * 0.62); 
-        ctx.fillStyle = "#e0e0e0"; 
-        ctx.font = `bold ${Math.round(12 * scaleRatio)}px sans-serif`; 
-        ctx.fillText("STUDIO", cx, h * 0.78); 
+        ctx.fillText(custom77, cx, h * 0.62); 
+        if(custom77 === "MASTER") {
+            ctx.fillStyle = "#e0e0e0"; 
+            ctx.font = `bold ${Math.round(12 * scaleRatio)}px sans-serif`; 
+            ctx.fillText("STUDIO", cx, h * 0.78); 
+        }
         ctx.restore();
     } else if (style === 'amber_mod75') {
         let bgGrad = ctx.createRadialGradient(w/2, h*0.5, 5, w/2, h*0.5, h * 0.95); 
@@ -981,7 +1002,7 @@ function renderFaceToCtx(ctx, style, w, h, backlight) {
         ctx.save(); 
         ctx.font = `italic 300 ${Math.round(16 * scaleRatio)}px "Times New Roman", serif`; 
         ctx.fillStyle = backlight ? "#ffca28" : "#886614"; 
-        ctx.fillText("Classic", cx, h * 0.70); 
+        ctx.fillText(getCustomLabel('amber_mod75', "Classic"), cx, h * 0.70); 
         ctx.restore();
     } else if (style === 'touch_mod15') {
         let bgGrad = ctx.createRadialGradient(w/2, h*0.5, 5, w/2, h*0.5, h * 0.95); 
@@ -1036,7 +1057,7 @@ function renderFaceToCtx(ctx, style, w, h, backlight) {
         ctx.font = `italic 500 ${Math.round(12 * scaleRatio)}px "Georgia", serif`; 
         ctx.fillStyle = "#333"; 
         ctx.textAlign = "center"; 
-        ctx.fillText("Touch Panel", cx, h * 0.62); 
+        ctx.fillText(getCustomLabel('touch_mod15', "Touch Panel"), cx, h * 0.62); 
         ctx.font = `bold ${Math.round(15 * scaleRatio)}px sans-serif`; 
         ctx.fillStyle = "#111"; 
         ctx.fillText("VU", cx, h * 0.78); 
@@ -1125,7 +1146,7 @@ function renderFaceToCtx(ctx, style, w, h, backlight) {
         }
         ctx.textAlign = "center"; 
         ctx.font = `bold ${Math.round(11 * scaleRatio)}px sans-serif`; 
-        ctx.fillText("WAVES", cx, logoY + triH + 14 * scaleRatio); 
+        ctx.fillText(getCustomLabel('waves_mod99', "WAVES"), cx, logoY + triH + 14 * scaleRatio); 
         ctx.restore();
     } else if (style === 'british_mod90') {
         ctx.fillStyle = "#0c0c0c"; 
@@ -1211,7 +1232,7 @@ function renderFaceToCtx(ctx, style, w, h, backlight) {
         ctx.textAlign = "center"; 
         ctx.fillStyle = "#c80000"; 
         ctx.font = `italic bold ${Math.round(23 * scaleRatio)}px "Brush Script MT", cursive`; 
-        ctx.fillText("Console", cx, h * 0.52); 
+        ctx.fillText(getCustomLabel('british_mod90', "Console"), cx, h * 0.52); 
         ctx.restore();
     } else if (style === 'vintage_mod60') {
         let bgGrad = ctx.createLinearGradient(0, 0, 0, h); 
@@ -1274,7 +1295,7 @@ function renderFaceToCtx(ctx, style, w, h, backlight) {
         ctx.fillStyle = "#00e5ff"; 
         ctx.font = `bold ${Math.round(9 * scaleRatio)}px sans-serif`; 
         ctx.textAlign = "left"; 
-        ctx.fillText("PEAK LEVEL METER", w * 0.12, h * 0.28); 
+        ctx.fillText(getCustomLabel('vfd_mod85', "PEAK LEVEL METER"), w * 0.12, h * 0.28); 
         ctx.fillText("-30 -20  -10   -6   -3    0   +3  +6", w * 0.12, h * 0.38);
     } else {
         let bgGrad = ctx.createRadialGradient(w/2, h*0.45, 10, w/2, h*0.5, h * 1.15); 
@@ -1369,12 +1390,16 @@ function renderFaceToCtx(ctx, style, w, h, backlight) {
     }
 }
 
+// IL "TRUCCO" DEL CACHE AGGIORNATO (Forza il ridisegno se cambi l'etichetta)
 function drawFaceWithCache(ctx, style) {
     const w = ctx.canvas.width; 
     const h = ctx.canvas.height;
     let tgl = document.getElementById('backlightToggle');
     let backlight = tgl ? tgl.checked : true;
-    let cacheKey = style + "_" + backlight + "_" + w + "x" + h;
+    
+    loadCustomLabels(); 
+    let customHash = JSON.stringify(globalCustomLabels);
+    let cacheKey = style + "_" + backlight + "_" + w + "x" + h + "_" + customHash;
 
     if (!bgCache[cacheKey]) {
         let offCanvas = document.createElement('canvas'); 

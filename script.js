@@ -365,36 +365,46 @@ function applyDeviceLayout() {
 
 function updateUITheme(style) {
     let bLogo = document.getElementById('brandLogo');
-    if(!bLogo) return; 
-    bLogo.removeAttribute('style'); 
-    let themeClass = 'theme-default', logoText = "CLASSIC '70", fontClass = "blue_mod70"; 
-    
-    if (style === 'blue_mono_mod1000') { themeClass = 'theme-blue_mono'; logoText = "MONO 1000"; fontClass = "blue_mono"; } 
-    else if (style === 'champagne_mod73') { themeClass = 'theme-champagne'; logoText = "CHAMPAGNE '73"; fontClass = "champagne"; } 
-    else if (style === 'vfd_mod85' || style === 'neon_mod95' || style === 'flat_mod00') { 
-        themeClass = 'theme-vfd_peak'; logoText = (style==='vfd_mod85') ? "VFD PEAK '85" : "STUDIO METER"; fontClass = (style==='vfd_mod85') ? "vfd_peak" : "peppy"; 
-        if(style!=='vfd_mod85') bLogo.style.fontFamily = "sans-serif"; 
-    } 
-    else if (style === 'studio_mod77' || style === 'minimal_mod00') { 
-        themeClass = 'theme-studio_master'; logoText = (style==='studio_mod77') ? "STUDIO MASTER '77" : "STUDIO METER"; fontClass = (style==='studio_mod77') ? "peppy" : "peppy"; 
-        if(style==='minimal_mod00') bLogo.style.fontFamily = "sans-serif"; 
-    } 
-    else if (style === 'waves_mod99') { themeClass = 'theme-waves'; logoText = "WAVES '99"; fontClass="waves"; } 
-    else if (style === 'british_mod90') { themeClass = 'theme-british_console'; logoText = "BRITISH EQ '90"; fontClass = "british_console"; } 
-    else if (style === 'vintage_mod60' || style === 'orange_mod70' || style === 'amber_mod75' || style === 'tube_mod50') { 
-        themeClass = 'theme-vintage'; 
-        if(style==='amber_mod75') { logoText = "AMBER '75"; fontClass="amber_classic"; } 
-        else if(style==='tube_mod50') { logoText = "TUBE GLOW '50"; fontClass="peppy"; } 
-        else { logoText = "VINTAGE '60"; fontClass="vintage"; } 
-    } 
-    else if (style === 'touch_mod15') { themeClass = 'theme-default'; logoText = "TOUCH METER '15"; fontClass="picore"; } 
-    else if (style && style.includes('meter')) { themeClass = 'theme-default'; logoText = "VU METER"; fontClass="peppy"; } 
-    
-    document.body.className = document.body.className.replace(/theme-\S+/g, '').trim(); 
-    document.body.classList.add(themeClass); 
-    applyDeviceLayout(); 
-    bLogo.textContent = logoText; 
-    bLogo.className = "brand-logo " + fontClass; 
+    if(!bLogo) return;
+    bLogo.removeAttribute('style');
+    let themeClass = 'theme-default', logoText = "CLASSIC '70", fontClass = "blue_mod70";
+
+    if (style === 'blue_mono_mod1000') { themeClass = 'theme-blue_mono'; logoText = "MONO 1000"; fontClass = "blue_mono"; }
+    else if (style === 'champagne_mod73') { themeClass = 'theme-champagne'; logoText = "CHAMPAGNE '73"; fontClass = "champagne"; }
+    else if (style === 'vfd_mod85' || style === 'neon_mod95' || style === 'flat_mod00') {
+        themeClass = 'theme-vfd_peak'; logoText = (style==='vfd_mod85') ? "VFD PEAK '85" : "STUDIO METER"; fontClass = (style==='vfd_mod85') ? "vfd_peak" : "peppy";
+        if(style!=='vfd_mod85') bLogo.style.fontFamily = "sans-serif";
+    }
+    else if (style === 'studio_mod77' || style === 'minimal_mod00') {
+        themeClass = 'theme-studio_master'; logoText = (style==='studio_mod77') ? "STUDIO MASTER '77" : "STUDIO METER"; fontClass = (style==='studio_mod77') ? "peppy" : "peppy";
+        if(style==='minimal_mod00') bLogo.style.fontFamily = "sans-serif";
+    }
+    else if (style === 'waves_mod99') { themeClass = 'theme-waves'; logoText = "WAVES '99"; fontClass="waves"; }
+    else if (style === 'british_mod90') { themeClass = 'theme-british_console'; logoText = "BRITISH EQ '90"; fontClass = "british_console"; }
+    else if (style === 'vintage_mod60' || style === 'orange_mod70' || style === 'amber_mod75' || style === 'tube_mod50') {
+        themeClass = 'theme-vintage';
+        if(style==='amber_mod75') { logoText = "AMBER '75"; fontClass="amber_classic"; }
+        else if(style==='tube_mod50') { logoText = "TUBE GLOW '50"; fontClass="peppy"; }
+        else { logoText = "VINTAGE '60"; fontClass="vintage"; }
+    }
+    else if (style === 'touch_mod15') { themeClass = 'theme-default'; logoText = "TOUCH METER '15"; fontClass="picore"; }
+    else if (style && style.includes('meter')) { themeClass = 'theme-default'; logoText = "VU METER"; fontClass="peppy"; }
+
+    // --- INIZIO LETTURA NOMI PERSONALIZZATI (SOVRASCRIVE IL DEFAULT) ---
+    try {
+        let labels = JSON.parse(localStorage.getItem('customLabels') || '{}');
+        let cleanStyle = style.replace('vu_', ''); // Sicurezza sulla chiave
+        if (labels[cleanStyle] && labels[cleanStyle].trim() !== '') {
+            logoText = labels[cleanStyle];
+        }
+    } catch(e) {}
+    // --- FINE LETTURA NOMI PERSONALIZZATI ---
+
+    document.body.className = document.body.className.replace(/theme-\S+/g, '').trim();
+    document.body.classList.add(themeClass);
+    if(typeof applyDeviceLayout === 'function') applyDeviceLayout();
+    bLogo.textContent = logoText;
+    bLogo.className = "brand-logo " + fontClass;
 }
 
 async function loadSettings() { 
@@ -1943,3 +1953,21 @@ function importConfig(input) {
     };
     reader.readAsText(file);
 }
+
+// ==========================================
+// AGGIORNAMENTO DINAMICO MENU A TENDINA
+// ==========================================
+setInterval(() => {
+    try {
+        let labels = JSON.parse(localStorage.getItem('customLabels') || '{}');
+        let select = document.getElementById('vuStyleSelect');
+        if (select) {
+            Array.from(select.options).forEach(opt => {
+                let key = opt.value.replace('vu_', '');
+                if (labels[key] && labels[key].trim() !== '') {
+                    opt.textContent = labels[key];
+                }
+            });
+        }
+    } catch(e) {}
+}, 1500);

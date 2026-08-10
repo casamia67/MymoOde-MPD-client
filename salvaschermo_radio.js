@@ -14,6 +14,16 @@ var radioDOMContainer = null;
 var radioNeedleDOM = null;
 var radioTextDOM = null;
 
+// --- NUOVA FUNZIONE PER LEGGERE LE ETICHETTE PERSONALIZZATE ---
+function getRadioCustomLabel(modelKey, defaultName) {
+    try {
+        let labels = JSON.parse(localStorage.getItem('customLabels') || '{}');
+        return labels[modelKey] && labels[modelKey].trim() !== "" ? labels[modelKey] : defaultName;
+    } catch (e) {
+        return defaultName;
+    }
+}
+
 function injectRadioStyles() {
     if (document.getElementById('radio3DStyle')) return;
     let style = document.createElement('style');
@@ -296,7 +306,7 @@ function getRadioHTML(model) {
         <div class="radio-body-3d wood-radica model-radica_mod58" style="position: relative;">
             <div class="radio-noise-overlay"></div>
             <!-- LOGO MODIFICATO -->
-            <div style="position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%); color: #ffca28; font-family: 'Brush Script MT', cursive, serif; font-size: 16px; text-shadow: 1px 1px 3px rgba(0,0,0,0.8), -1px -1px 0px rgba(255,255,255,0.1), 0px 0px 5px rgba(230,190,0,0.4); z-index: 10; letter-spacing: 1px;">Radica</div>
+            <div style="position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%); color: #ffca28; font-family: 'Brush Script MT', cursive, serif; font-size: 16px; text-shadow: 1px 1px 3px rgba(0,0,0,0.8), -1px -1px 0px rgba(255,255,255,0.1), 0px 0px 5px rgba(230,190,0,0.4); z-index: 10; letter-spacing: 1px;">${getRadioCustomLabel('radica_mod58', 'Radica')}</div>
             
             <div class="bezel-gold-dark" style="margin-top: 10px;">
                 <div style="display:flex; gap: 12px; height: 180px;">
@@ -321,7 +331,7 @@ function getRadioHTML(model) {
             <div class="radio-noise-overlay"></div>
             <div class="speaker-zone speaker-superla" style="height: 220px; width: 440px; margin: 0 auto; border-radius: 220px 220px 6px 6px; border: 2px solid #3a1c04; box-shadow: inset 0 10px 20px rgba(0,0,0,0.9); position: relative;">
                 <!-- LOGO MODIFICATO -->
-                <div style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); color: #dca33c; font-family: 'Times New Roman', serif; font-weight: bold; font-size: 18px; letter-spacing: 8px; text-shadow: 2px 2px 5px #000;">CLASSIC</div>
+                <div style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); color: #dca33c; font-family: 'Times New Roman', serif; font-weight: bold; font-size: 18px; letter-spacing: 8px; text-shadow: 2px 2px 5px #000;">${getRadioCustomLabel('bakelite_mod35', 'CLASSIC')}</div>
             </div>
             <div class="glass-dial brass-bezel" id="radioGlassDial" style="height: 130px; margin-top: 15px; border-radius: 6px; background: linear-gradient(to bottom, #e3cd91 0%, #c4a75c 100%);">
                 <div class="radio-needle" id="radioNeedle" style="background: #333;"></div>
@@ -339,7 +349,7 @@ function getRadioHTML(model) {
             <div class="radio-noise-overlay"></div>
             <div class="bezel-full-gold" style="position: relative;">
                 <!-- LOGO MODIFICATO -->
-                <div style="position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%); color: #5c4314; font-family: sans-serif; font-weight: 900; font-size: 13px; letter-spacing: 5px; z-index: 10;">COMPACT</div>
+                <div style="position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%); color: #5c4314; font-family: sans-serif; font-weight: 900; font-size: 13px; letter-spacing: 5px; z-index: 10;">${getRadioCustomLabel('compact_mod65', 'COMPACT')}</div>
                 
                 <div class="speaker-zone speaker-dots" style="width: 35%; height: 100%; border-radius: 8px; border: 2px solid #5c4314;"></div>
                 <div style="width: 65%; display: flex; flex-direction: column; justify-content: space-between; padding-bottom: 15px;">
@@ -363,7 +373,7 @@ function getRadioHTML(model) {
             <div class="radio-noise-overlay"></div>
             <div class="speaker-zone speaker-superla" style="width: 100%; height: 55%; border-radius: 6px; border: 3px solid #2a1b10; box-shadow: inset 0 10px 20px rgba(0,0,0,0.8); position: relative;">
                <!-- LOGO MODIFICATO -->
-               <div style="color:#e0e0e0; font-family:sans-serif; font-weight:bold; font-size:22px; position:absolute; top:12px; left:18px; letter-spacing: 2px;">Rover</div>
+               <div style="color:#e0e0e0; font-family:sans-serif; font-weight:bold; font-size:22px; position:absolute; top:12px; left:18px; letter-spacing: 2px;">${getRadioCustomLabel('transistor_mod68', 'Rover')}</div>
             </div>
             <div style="height: 45%; display: flex; gap: 15px; background: #e8decf; padding: 12px; border-radius: 6px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.3);">
                 <div class="glass-dial" id="radioGlassDial" style="width: 75%; height: 100%; border-radius: 4px;">
@@ -383,7 +393,7 @@ function getRadioHTML(model) {
             <div class="radio-noise-overlay"></div>
             <div class="console-bezel" style="position: relative;">
                 <!-- LOGO MODIFICATO -->
-                <div style="position: absolute; top: 15px; right: 40px; color: #593112; font-family: 'Georgia', serif; font-style: italic; font-weight: bold; font-size: 24px; letter-spacing: 1px; text-shadow: 1px 1px 0px rgba(255,255,255,0.9); z-index: 10;">Console</div>
+                <div style="position: absolute; top: 15px; right: 40px; color: #593112; font-family: 'Georgia', serif; font-style: italic; font-weight: bold; font-size: 24px; letter-spacing: 1px; text-shadow: 1px 1px 0px rgba(255,255,255,0.9); z-index: 10;">${getRadioCustomLabel('console_mod55', 'Console')}</div>
                 
                 <div style="display:flex; gap: 15px; height: 170px;">
                     <div class="speaker-zone speaker-superla" style="width: 38%; margin-top: 25px; border-radius: 12px; border: 2px solid #a89a85; box-shadow: inset 0 5px 15px rgba(0,0,0,0.9);"></div>
@@ -410,7 +420,7 @@ function getRadioHTML(model) {
             <div class="teutonia-bezel" style="position: relative;">
                 <div class="speaker-zone speaker-superla" style="flex:1; border-radius: 8px; position:relative; border: 1px solid #b59b57; box-shadow: inset 0 10px 20px rgba(0,0,0,0.9);">
                     <!-- LOGO MODIFICATO -->
-                    <div style="position: absolute; top: 12px; left: 50%; transform: translateX(-50%); color: #d4af37; font-family: sans-serif; font-weight: bold; font-size: 20px; letter-spacing: 6px; text-shadow: 2px 2px 6px #000, 0 0 2px #000;">TEUTONIA</div>
+                    <div style="position: absolute; top: 12px; left: 50%; transform: translateX(-50%); color: #d4af37; font-family: sans-serif; font-weight: bold; font-size: 20px; letter-spacing: 6px; text-shadow: 2px 2px 6px #000, 0 0 2px #000;">${getRadioCustomLabel('teutonia_mod54', 'TEUTONIA')}</div>
                 </div>
                 <div class="teutonia-black-dial brass-bezel" id="radioGlassDial">
                     <div class="heavy-knob knob-white" style="width:50px;height:50px; flex-shrink:0;"></div>

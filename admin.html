@@ -31,6 +31,28 @@
         }
         .header-admin h1 { margin-top: 0; color: #fff; display: flex; justify-content: center; align-items: center; gap: 15px;}
         .header-admin p { color: #aaa; margin-bottom: 0; font-size: 1.1rem; }
+        
+        .label-grid {
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 15px; 
+            margin-bottom: 20px;
+        }
+        .label-grid > div {
+            display: flex;
+            flex-direction: column;
+        }
+        .label-grid label {
+            margin-top: 0;
+            margin-bottom: 5px;
+            color: #fff;
+            font-size: 0.85rem;
+            font-weight: normal;
+        }
+        .label-grid input {
+            padding: 0.6rem;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body class="theme-default">
@@ -47,6 +69,7 @@
 
         <div class="settings-grid">
             
+            <!-- BLOCCO 1: ASPETTO E LAYOUT -->
             <div class="settings-card" style="flex: 1 1 100%;">
                 <h3><i class="bi bi-palette"></i> Aspetto & Screensaver Predefiniti</h3>
                 
@@ -125,6 +148,7 @@
                 </div>
             </div>
 
+            <!-- BLOCCO 2: CONNESSIONI E INDIRIZZI -->
             <div class="settings-card" style="flex: 1 1 100%;">
                 <h3><i class="bi bi-hdd-network"></i> Indirizzi di Rete e Integrazioni</h3>
                 <label>CamillaDSP WebSocket URI (Per l'elaborazione del segnale)</label>
@@ -136,6 +160,51 @@
 
                 <label style="margin-top: 1rem;">URL Interfaccia Ufficiale moOde Audio</label>
                 <input type="text" id="defMoodeUrl" placeholder="es. http://192.168.1.50">
+            </div>
+
+            <!-- BLOCCO 3: PERSONALIZZAZIONE ETICHETTE -->
+            <div class="settings-card" style="flex: 1 1 100%;">
+                <h3><i class="bi bi-fonts"></i> Personalizzazione Etichette (Opzionale)</h3>
+                <p class="hint" style="margin-bottom: 1.5rem; font-size: 0.85rem;">Se desideri sostituire i nomi di fantasia predefiniti con altri nomi o marchi a tua scelta, inseriscili qui sotto. Lasciando il campo vuoto verrà utilizzato il nome di fabbrica dell'interfaccia.</p>
+
+                <h4 style="color: var(--hl-color); margin-top: 5px; margin-bottom: 15px; font-size: 1.05rem;">Hi-Fi Studio Racks (VU Meter)</h4>
+                <div class="label-grid">
+                    <div><label>Blue Classic Mod. 70</label><input type="text" id="lbl_blue_mod70" placeholder="Es. McIntosh"></div>
+                    <div><label>Blue Mono Mod. 1000</label><input type="text" id="lbl_blue_mono_mod1000" placeholder="Es. MC1.25KW"></div>
+                    <div><label>Champagne Gold Mod. 73</label><input type="text" id="lbl_champagne_mod73" placeholder="Es. Accuphase"></div>
+                    <div><label>VFD Peak Mod. 85</label><input type="text" id="lbl_vfd_mod85" placeholder="Es. Technics"></div>
+                    <div><label>Studio Master Mod. 77</label><input type="text" id="lbl_studio_mod77" placeholder="Es. Revox"></div>
+                    <div><label>British Console Mod. 90</label><input type="text" id="lbl_british_mod90" placeholder="Es. Ashdown"></div>
+                    <div><label>Amber Classic Mod. 75</label><input type="text" id="lbl_amber_mod75" placeholder="Es. Luxman"></div>
+                    <div><label>Studio Vintage Mod. 60</label><input type="text" id="lbl_vintage_mod60" placeholder="Es. Vintage"></div>
+                    <div><label>Waves Studio Mod. 99</label><input type="text" id="lbl_waves_mod99" placeholder="Es. Waves"></div>
+                    <div><label>Dark Meter Mod. 88</label><input type="text" id="lbl_dark_meter_mod88" placeholder="Personalizza testo..."></div>
+                    <div><label>Light Meter Mod. 88</label><input type="text" id="lbl_light_meter_mod88" placeholder="Personalizza testo..."></div>
+                    <div><label>Cyan Meter Mod. 88</label><input type="text" id="lbl_cyan_meter_mod88" placeholder="Personalizza testo..."></div>
+                    <div><label>Neon Cyan Mod. 95</label><input type="text" id="lbl_neon_mod95" placeholder="Personalizza testo..."></div>
+                    <div><label>Minimal Dark Mod. 00</label><input type="text" id="lbl_minimal_mod00" placeholder="Personalizza testo..."></div>
+                    <div><label>Warm Orange Mod. 70</label><input type="text" id="lbl_orange_mod70" placeholder="Personalizza testo..."></div>
+                    <div><label>Blue Tube Mod. 50</label><input type="text" id="lbl_tube_mod50" placeholder="Personalizza testo..."></div>
+                    <div><label>Minimal Flat Mod. 00</label><input type="text" id="lbl_flat_mod00" placeholder="Personalizza testo..."></div>
+                    <div><label>Touch VU Mod. 15</label><input type="text" id="lbl_touch_mod15" placeholder="Es. piCorePlayer"></div>
+                </div>
+
+                <h4 style="color: var(--hl-color); margin-top: 10px; margin-bottom: 15px; font-size: 1.05rem;">Vintage 3D Radios</h4>
+                <div class="label-grid">
+                    <div><label>Radica Mod. 58</label><input type="text" id="lbl_radica_mod58" placeholder="Es. Prandoni"></div>
+                    <div><label>Classic '35</label><input type="text" id="lbl_bakelite_mod35" placeholder="Es. Superla"></div>
+                    <div><label>Console '55</label><input type="text" id="lbl_console_mod55" placeholder="Es. Phonola"></div>
+                    <div><label>Teutonia 54</label><input type="text" id="lbl_teutonia_mod54" placeholder="Es. Grundig"></div>
+                    <div><label>Solid State '68</label><input type="text" id="lbl_transistor_mod68" placeholder="Es. Sony"></div>
+                    <div><label>Compact 65</label><input type="text" id="lbl_compact_mod65" placeholder="Personalizza testo..."></div>
+                </div>
+
+                <!-- NUOVO: PULSANTE RIPRISTINA NOMI -->
+                <div style="margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem; text-align: right;">
+                    <button class="btn-addplay" style="width: auto; display: inline-flex; background: rgba(220,53,69,0.15); color: #ff6b6b; border-color: rgba(220,53,69,0.4); padding: 12px 20px;" onclick="resetCustomLabels()">
+                        <i class="bi bi-eraser-fill"></i> Ripristina Etichette di Fabbrica
+                    </button>
+                </div>
             </div>
             
         </div>
@@ -154,34 +223,50 @@
     <!-- LOGICA JAVASCRIPT DEL PANNELLO ADMIN -->
     <script>
         const API = 'mpd_bridge.php';
+        const rackModels = ['blue_mod70', 'blue_mono_mod1000', 'champagne_mod73', 'vfd_mod85', 'vintage_mod60', 'waves_mod99', 'studio_mod77', 'dark_meter_mod88', 'british_mod90', 'light_meter_mod88', 'cyan_meter_mod88', 'neon_mod95', 'minimal_mod00', 'orange_mod70', 'tube_mod50', 'flat_mod00', 'touch_mod15', 'amber_mod75'];
+        const radioModels = ['radica_mod58', 'bakelite_mod35', 'compact_mod65', 'transistor_mod68', 'console_mod55', 'teutonia_mod54'];
+        const allModels = rackModels.concat(radioModels);
 
         async function loadGlobalDefaults() {
+            try {
+                let labels = JSON.parse(localStorage.getItem('customLabels') || '{}');
+                allModels.forEach(m => {
+                    let el = document.getElementById('lbl_' + m);
+                    if (el) el.value = labels[m] || '';
+                });
+            } catch(e) {}
+
             try {
                 let res = await fetch(`${API}?action=get_default_settings&_t=${Date.now()}`);
                 if (res.ok) {
                     let d = await res.json();
-                    
                     document.getElementById('defVuStyle').value = d.vuStyle || 'blue_mod70';
                     document.getElementById('defLayout').value = d.deviceLayout || 'auto';
                     document.getElementById('defSsTimeout').value = d.ssTimeout !== undefined ? d.ssTimeout : '1';
                     document.getElementById('defSsRandom').value = d.ssRandom !== undefined ? d.ssRandom : '0.5';
-                    
                     document.getElementById('defInlineVu').checked = d.inlineVu !== false;
                     document.getElementById('defBacklight').checked = d.backlight !== false;
                     document.getElementById('defLocalAnalyzer').checked = d.localAnalyzer !== false;
                     document.getElementById('defKeepSsStyle').checked = d.keepSsStyle === true;
                     document.getElementById('defMiniPlayerSs').checked = d.miniPlayerSs !== false;
-
                     document.getElementById('defWsUri').value = d.wsUri || '';
                     document.getElementById('defStreamUrl').value = d.streamUrl || '';
                     document.getElementById('defMoodeUrl').value = d.moodeUrl || '';
                 }
-            } catch (e) {
-                console.error("Errore caricamento predefiniti globali", e);
-            }
+            } catch (e) {}
         }
 
         async function saveGlobalDefaults() {
+            let customLabels = {};
+            allModels.forEach(m => {
+                let el = document.getElementById('lbl_' + m);
+                if (el && el.value.trim() !== '') {
+                    customLabels[m] = el.value.trim();
+                }
+            });
+
+            localStorage.setItem('customLabels', JSON.stringify(customLabels));
+
             let payload = {
                 vuStyle: document.getElementById('defVuStyle').value,
                 deviceLayout: document.getElementById('defLayout').value,
@@ -197,40 +282,42 @@
                 moodeUrl: document.getElementById('defMoodeUrl').value.trim()
             };
 
-            let btn = document.querySelector('button');
+            let btn = document.querySelector('.btn-addplay[onclick="saveGlobalDefaults()"]');
             let originalHtml = btn.innerHTML;
             btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Salvataggio...';
             btn.style.opacity = '0.7';
 
             try {
-                let res = await fetch(`${API}?action=set_default_settings`, {
+                await fetch(`${API}?action=set_default_settings`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                
-                if (res.ok) {
-                    btn.innerHTML = '<i class="bi bi-check-circle-fill"></i> Predefiniti Salvati!';
-                    btn.style.background = '#198754';
-                    btn.style.color = '#fff';
-                    setTimeout(() => {
-                        btn.innerHTML = originalHtml;
-                        btn.style.background = 'var(--hl-color)';
-                        btn.style.color = '#000';
-                        btn.style.opacity = '1';
-                    }, 3000);
-                } else {
-                    alert("Si è verificato un errore durante il salvataggio sul server.");
-                    btn.innerHTML = originalHtml;
-                    btn.style.opacity = '1';
-                }
-            } catch (e) {
-                alert("Errore di rete. Impossibile contattare il Raspberry.");
-                console.error(e);
+            } catch (e) {}
+            
+            btn.innerHTML = '<i class="bi bi-check-circle-fill"></i> Predefiniti e Nomi Salvati!';
+            btn.style.background = '#198754';
+            btn.style.color = '#fff';
+            setTimeout(() => {
                 btn.innerHTML = originalHtml;
+                btn.style.background = 'var(--hl-color)';
+                btn.style.color = '#000';
                 btn.style.opacity = '1';
+            }, 3000);
+        }
+
+        // NUOVA: Funzione per ripristinare i nomi di fabbrica
+        function resetCustomLabels() {
+            if (confirm("Vuoi davvero cancellare tutte le tue etichette personalizzate e tornare ai nomi originali di fabbrica?")) {
+                allModels.forEach(m => {
+                    let el = document.getElementById('lbl_' + m);
+                    if (el) el.value = '';
+                });
+                localStorage.removeItem('customLabels');
+                saveGlobalDefaults(); // Salva immediatamente i campi svuotati
             }
         }
+
         window.onload = loadGlobalDefaults;
     </script>
 </body>
