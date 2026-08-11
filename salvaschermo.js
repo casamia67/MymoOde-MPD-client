@@ -508,14 +508,14 @@ function renderFaceToCtx(ctx, style, w, h, backlight) {
         ctx.fillStyle = "#ffffff"; 
         ctx.textAlign = "center"; 
         ctx.font = `bold ${Math.round(11 * scaleRatio)}px sans-serif`; 
-        ctx.fillText("WATTS", cx, h * 0.17); 
+        ctx.fillText("WATTS", cx, h * 0.70); 
         ctx.font = `${Math.round(10 * scaleRatio)}px sans-serif`; 
-        ctx.fillText("DECIBELS", cx, h * 0.41); 
+        ctx.fillText("dB", cx, h * 0.38); 
         ctx.font = `${Math.round(10 * scaleRatio)}px sans-serif`; 
         ctx.fillText("POWER OUTPUT", cx, h * 0.57);
-        let mcWatts = [".012", ".12", "1.2", "12", "120", "1.2KW", "2.4K", "4.8K"]; 
+        let mcWatts = [".012", ".12", "1.2", "12", "120", "1.2", "2.4", "4.8"]; 
         let mcWattsAngles = [1.32, 1.38, 1.44, 1.50, 1.56, 1.62, 1.67, 1.70]; 
-        ctx.font = `bold ${Math.round(15 * scaleRatio)}px sans-serif`;
+        ctx.font = `bold ${Math.round(10 * scaleRatio)}px sans-serif`;
         for (let i = 0; i < mcWatts.length; i++) { 
             let ang = mcWattsAngles[i]; 
             let x = cx + (radius - (h * 0.15)) * Math.cos(Math.PI * ang); 
@@ -639,7 +639,7 @@ function renderFaceToCtx(ctx, style, w, h, backlight) {
         }
         ctx.font = `${Math.round(9*scaleRatio)}px sans-serif`; 
         ctx.fillText("WATTS", cx, h*0.25); 
-        ctx.fillText("DECIBELS", cx, h*0.58); 
+        ctx.fillText("dB", cx, h*0.58); 
         ctx.fillText("POWER OUTPUT", cx, h*0.75); 
         ctx.strokeStyle = "#000"; 
         ctx.lineWidth = 6; 
@@ -1122,8 +1122,8 @@ function renderFaceToCtx(ctx, style, w, h, backlight) {
         let vAngles = [1.32, 1.38, 1.42, 1.46, 1.50, 1.53, 1.56, 1.59, 1.62, 1.65, 1.68]; 
         for (let i = 0; i < vValues.length; i++) { 
             let ang = vAngles[i]; 
-            let x = cx + (radius - (winH * 0.28)) * Math.cos(Math.PI * ang); 
-            let y = cy + (radius - (h * 0.28)) * Math.sin(Math.PI * ang); 
+            let x = cx + (radius - (winH * 0.15)) * Math.cos(Math.PI * ang); 
+            let y = cy + (radius - (h * 0.15)) * Math.sin(Math.PI * ang); 
             ctx.fillText(vValues[i], x, y); 
         }
         ctx.font = `bold ${Math.round(13 * scaleRatio)}px sans-serif`; 
@@ -1327,14 +1327,14 @@ function renderFaceToCtx(ctx, style, w, h, backlight) {
         ctx.fillStyle = "#ffffff"; 
         ctx.textAlign = "center"; 
         ctx.font = `bold ${Math.round(10 * scaleRatio)}px sans-serif`; 
-        ctx.fillText("WATTS", cx, h * 0.17); 
+        ctx.fillText("WATTS", cx, h * 0.70); 
         ctx.font = `${Math.round(9 * scaleRatio)}px sans-serif`; 
-        ctx.fillText("DECIBELS", cx, h * 0.41); 
+        ctx.fillText("dB", cx, h * 0.38); 
         ctx.font = `${Math.round(9 * scaleRatio)}px sans-serif`; 
         ctx.fillText("POWER OUTPUT", cx, h * 0.57);
-        let mcWatts = ["6.0m", "60m", ".60", "6.0", "60", "600", "1.2K", "2.4K"]; 
+        let mcWatts = ["6.0m", "60m", ".60", "6.0", "60", "600", "1.2", "2.4"]; 
         let mcWattsAngles = [1.32, 1.38, 1.44, 1.50, 1.56, 1.62, 1.67, 1.70]; 
-        ctx.font = `bold ${Math.round(12 * scaleRatio)}px sans-serif`;
+        ctx.font = `bold ${Math.round(10 * scaleRatio)}px sans-serif`;
         for (let i = 0; i < mcWatts.length; i++) { 
             let ang = mcWattsAngles[i]; 
             let x = cx + (radius - (h * 0.15)) * Math.cos(Math.PI * ang); 

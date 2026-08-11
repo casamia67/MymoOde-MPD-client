@@ -411,26 +411,40 @@ async function loadSettings() {
     let hostname = window.location.hostname || "127.0.0.1"; 
     
     try { 
-        let res = await fetch(`${API}?action=get_default_settings&_t=${Date.now()}`); 
-        if (res.ok) { 
-            let defaults = await res.json(); 
-            if (Object.keys(defaults).length > 0) {
-                localStorage.setItem('camilla_ss_timeout', defaults.ssTimeout || '1'); 
-                localStorage.setItem('camilla_ss_random', defaults.ssRandom || '0.5'); 
-                localStorage.setItem('camilla_vu_style', defaults.vuStyle || 'blue_mod70'); 
-                localStorage.setItem('camilla_ws_uri', defaults.wsUri || ''); 
-                localStorage.setItem('moode_ui_url', defaults.moodeUrl || ''); 
-                localStorage.setItem('camilla_stream_url', defaults.streamUrl || `http://${hostname}:8000/mpd.ogg`); 
-                localStorage.setItem('camilla_backlight', defaults.backlight !== false); 
-                localStorage.setItem('camilla_inline_vu', defaults.inlineVu !== false); 
-                localStorage.setItem('camilla_local_analyzer', defaults.localAnalyzer !== false); 
-                localStorage.setItem('camilla_device_layout', defaults.deviceLayout || 'auto'); 
+        let defaultsToUse = {};
+
+        // 1. Tenta di caricare le impostazioni persistenti specifiche di questo dispositivo
+        let clientRes = await fetch(`${API}?action=get_client_settings&_t=${Date.now()}`); 
+        let clientData = await clientRes.json();
+        
+        if (clientRes.ok && !clientData.error && Object.keys(clientData).length > 0) {
+            defaultsToUse = clientData;
+        } else {
+            // 2. Se non esiste un salvataggio, usa i default globali (creati dall'admin)
+            let globalRes = await fetch(`${API}?action=get_default_settings&_t=${Date.now()}`);
+            if (globalRes.ok) {
+                defaultsToUse = await globalRes.json();
             }
-        } 
+        }
+        
+        if (Object.keys(defaultsToUse).length > 0) {
+            localStorage.setItem('camilla_ss_timeout', defaultsToUse.ssTimeout !== undefined ? defaultsToUse.ssTimeout : '1'); 
+            localStorage.setItem('camilla_ss_random', defaultsToUse.ssRandom !== undefined ? defaultsToUse.ssRandom : '0.5'); 
+            localStorage.setItem('camilla_vu_style', defaultsToUse.vuStyle || 'blue_mod70'); 
+            localStorage.setItem('camilla_ws_uri', defaultsToUse.wsUri || ''); 
+            localStorage.setItem('moode_ui_url', defaultsToUse.moodeUrl || ''); 
+            localStorage.setItem('camilla_stream_url', defaultsToUse.streamUrl || `http://${hostname}:8000/mpd.ogg`); 
+            localStorage.setItem('camilla_backlight', defaultsToUse.backlight !== false); 
+            localStorage.setItem('camilla_inline_vu', defaultsToUse.inlineVu !== false); 
+            localStorage.setItem('camilla_local_analyzer', defaultsToUse.localAnalyzer !== false); 
+            localStorage.setItem('camilla_device_layout', defaultsToUse.deviceLayout || 'auto'); 
+            if(defaultsToUse.wakeOnTrack !== undefined) localStorage.setItem('camilla_wake_on_track', defaultsToUse.wakeOnTrack);
+        }
     } catch (e) {
         console.warn("Server non raggiungibile, uso la cache locale");
     } 
     
+    // Riapplica i valori caricati all'interfaccia (come già facevi)
     if(document.getElementById('ssTimeout')) document.getElementById('ssTimeout').value = localStorage.getItem('camilla_ss_timeout') || '1'; 
     if(document.getElementById('ssRandomTime')) document.getElementById('ssRandomTime').value = localStorage.getItem('camilla_ss_random') || '0.5'; 
     if(document.getElementById('vuStyleSelect')) document.getElementById('vuStyleSelect').value = localStorage.getItem('camilla_vu_style') || 'blue_mod70'; 
@@ -441,11 +455,10 @@ async function loadSettings() {
     if(document.getElementById('inlineVuToggle')) document.getElementById('inlineVuToggle').checked = localStorage.getItem('camilla_inline_vu') !== 'false'; 
     if(document.getElementById('localAnalyzerToggle')) document.getElementById('localAnalyzerToggle').checked = localStorage.getItem('camilla_local_analyzer') !== 'false'; 
     if(document.getElementById('deviceLayout')) document.getElementById('deviceLayout').value = localStorage.getItem('camilla_device_layout') || 'auto'; 
+    if(document.getElementById('wakeOnTrackToggle')) document.getElementById('wakeOnTrackToggle').checked = localStorage.getItem('camilla_wake_on_track') !== 'false'; 
     
     let camillaTgl = document.getElementById('camillaDspToggle');
-    if (camillaTgl) {
-        camillaTgl.checked = localStorage.getItem('camilla_dsp_state') === 'true';
-    }
+    if (camillaTgl) camillaTgl.checked = localStorage.getItem('camilla_dsp_state') === 'true';
     
     let inlineC = document.getElementById('inlineVuContainer');
     let inlTgl = document.getElementById('inlineVuToggle');
@@ -462,6 +475,57 @@ async function loadSettings() {
     if (typeof resetIdle === 'function') resetIdle(); 
         
     initAutoSave();
+}
+
+// Nuove funzioni per i bottoni
+async function saveClientSettings() {
+    let payload = {
+        ssTimeout: document.getElementById('ssTimeout').value,
+        ssRandom: document.getElementById('ssRandomTime').value,
+        vuStyle: document.getElementById('vuStyleSelect').value,
+        wsUri: document.getElementById('wsUriInput').value,
+        moodeUrl: document.getElementById('moodeUiUrlInput').value,
+        streamUrl: document.getElementById('streamUrlInput').value,
+        backlight: document.getElementById('backlightToggle').checked,
+        inlineVu: document.getElementById('inlineVuToggle').checked,
+        localAnalyzer: document.getElementById('localAnalyzerToggle').checked,
+        deviceLayout: document.getElementById('deviceLayout').value,
+        wakeOnTrack: document.getElementById('wakeOnTrackToggle') ? document.getElementById('wakeOnTrackToggle').checked : true
+    };
+    
+    let btn = document.getElementById('btnSaveClient');
+    let originalHtml = btn.innerHTML;
+    btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Salvataggio...';
+    
+    try {
+        await fetch(`${API}?action=save_client_settings`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        
+        btn.innerHTML = '<i class="bi bi-check-circle-fill"></i> Configurazione Salvata';
+        btn.style.color = '#000';
+        setTimeout(() => {
+            btn.innerHTML = originalHtml;
+            btn.style.color = '#000';
+        }, 3000);
+    } catch (e) {
+        alert("Errore durante il salvataggio.");
+        btn.innerHTML = originalHtml;
+    }
+}
+
+async function restoreDefaultSettings() {
+    if(confirm("Vuoi eliminare la configurazione permanente di questo dispositivo e ripristinare i valori globali?")) {
+        try {
+            await fetch(`${API}?action=delete_client_settings`);
+            localStorage.clear();
+            location.reload();
+        } catch (e) {
+            alert("Errore durante il ripristino.");
+        }
+    }
 }
 
 function initAutoSave() {
@@ -490,6 +554,9 @@ function saveSettings() {
     let inlineVu = document.getElementById('inlineVuToggle') ? document.getElementById('inlineVuToggle').checked : true;
     let localAnalyzer = document.getElementById('localAnalyzerToggle') ? document.getElementById('localAnalyzerToggle').checked : true;
     let deviceLayout = document.getElementById('deviceLayout') ? document.getElementById('deviceLayout').value : 'auto';
+    
+    // SALVATAGGIO NUOVO INTERRUTTORE
+    let wakeOnTrack = document.getElementById('wakeOnTrackToggle') ? document.getElementById('wakeOnTrackToggle').checked : true;
 
     localStorage.setItem('camilla_ss_timeout', ssTimeout);
     localStorage.setItem('camilla_ss_random', ssRandom);
@@ -501,6 +568,7 @@ function saveSettings() {
     localStorage.setItem('camilla_inline_vu', inlineVu);
     localStorage.setItem('camilla_local_analyzer', localAnalyzer);
     localStorage.setItem('camilla_device_layout', deviceLayout);
+    localStorage.setItem('camilla_wake_on_track', wakeOnTrack);
 
     let settingsPayload = {
         ssTimeout: ssTimeout,
@@ -634,13 +702,15 @@ async function fetchStatus() {
             }
         }
         
-        // Aggiornamento Stato Play/Pausa
+        // --- Aggiornamento Stato Play/Pausa Ottimizzato ---
         if (d.state) {
-            let btnPlay = document.getElementById('btnPlay');
-            if(btnPlay) btnPlay.innerHTML = d.state === 'play' ? '<i class="bi bi-pause-fill"></i>' : '<i class="bi bi-play-fill"></i>';
-            
-            let ssBtnPlay = document.getElementById('ssBtnPlay');
-            if(ssBtnPlay) ssBtnPlay.innerHTML = d.state === 'play' ? '<i class="bi bi-pause-fill"></i>' : '<i class="bi bi-play-fill"></i>';
+            let newIcon = d.state === 'play' ? '<i class="bi bi-pause-fill"></i>' : '<i class="bi bi-play-fill"></i>';
+            ['btnPlay', 'ssBtnPlay', 'mpBtnPlay'].forEach(id => {
+                let btn = document.getElementById(id);
+                if (btn && btn.innerHTML !== newIcon) {
+                    btn.innerHTML = newIcon;
+                }
+            });
         }
         
         // Richiama l'aggiornamento grafico
@@ -673,7 +743,8 @@ async function fetchStatus() {
             if (ssTrackInfo) ssTrackInfo.textContent = t('msg_offline'); // Usa la traduzione
             
             let btnPlay = document.getElementById('btnPlay');
-            if(btnPlay) btnPlay.innerHTML = '<i class="bi bi-play-fill"></i>';
+            let newIcon = '<i class="bi bi-play-fill"></i>';
+            if(btnPlay && btnPlay.innerHTML !== newIcon) btnPlay.innerHTML = newIcon;
 
             // 3. Invia il comando di STOP in background per sganciare MPD dal loop
             fetch(`${API}?action=command&cmd=stop`).catch(() => {});
@@ -708,8 +779,11 @@ function updateNowPlaying(d) {
             mpTitle.textContent = safeTitle; 
             let mpA = document.getElementById('mpArtist');
             if(mpA) mpA.textContent = safeArtist;
+            
             let mpBP = document.getElementById('mpBtnPlay');
-            if(mpBP) mpBP.innerHTML = d.state === 'play' ? '<i class="bi bi-pause-fill"></i>' : '<i class="bi bi-play-fill"></i>';
+            let newMpIcon = d.state === 'play' ? '<i class="bi bi-pause-fill"></i>' : '<i class="bi bi-play-fill"></i>';
+            if(mpBP && mpBP.innerHTML !== newMpIcon) mpBP.innerHTML = newMpIcon;
+            
             let progEl = document.getElementById('mpProgress'); 
             if(progEl) progEl.style.width = (currentDuration > 0 ? ((d.elapsed || 0) / currentDuration) * 100 : 0) + '%';
         }
@@ -726,11 +800,44 @@ function updateNowPlaying(d) {
             fileUpper.endsWith('.M3U8')
         );
 
-        let fileChanged = (window.lastPlayedFile !== fileStr);
-        window.lastPlayedFile = fileStr;
+        // --- 1. RILEVAMENTO CAMBIO TRACCIA ---
+        if (typeof window.lastPlayedFile === 'undefined') {
+            window.lastPlayedFile = fileStr;
+            window.lastPlayedTitle = safeTitle;
+        }
 
+        let fileChanged = (window.lastPlayedFile !== fileStr);
         let titleChanged = (window.lastPlayedTitle !== safeTitle);
+
+        window.lastPlayedFile = fileStr;
         window.lastPlayedTitle = safeTitle;
+
+        // --- 2. AZIONE: RITORNO AL PLAYER (CON ECCEZIONE RADIO E INTERRUTTORE) ---
+        let shouldWakeUp = false;
+        
+        if (isStream) {
+            // Radio: sveglia l'interfaccia SOLO se cambia la stazione (URL)
+            shouldWakeUp = fileChanged;
+        } else {
+            // Audio locale: sveglia l'interfaccia se cambia il file o il titolo
+            shouldWakeUp = (fileChanged || titleChanged);
+        }
+
+        // Legge lo stato dell'interruttore (di default è acceso)
+        let wakeEnabled = localStorage.getItem('camilla_wake_on_track') !== 'false';
+
+        // Scatta solo se il cambio traccia lo richiede E se l'interruttore è acceso
+        if (shouldWakeUp && wakeEnabled) {
+            
+            if (typeof ssActive !== 'undefined' && ssActive) {
+                if (typeof exitScreensaver === 'function') exitScreensaver();
+            }
+
+            let activeTab = document.querySelector('.tab-pane.active');
+            if (activeTab && activeTab.id !== 'tab-nowplaying') {
+                switchTab('nowplaying');
+            }
+        }
 
         let inferredExtension = '';
         if (isStream) {
@@ -965,11 +1072,18 @@ function updateNowPlaying(d) {
         let btnRepeat = document.getElementById('btnRepeat');
         if(btnRepeat) btnRepeat.classList.toggle('active', d.repeat === '1'); 
         
+        let ssBtnRepeat = document.getElementById('ssBtnRepeat');
+        if(ssBtnRepeat) ssBtnRepeat.classList.toggle('active', d.repeat === '1');
+        
         let btnRandom = document.getElementById('btnRandom');
         if(btnRandom) btnRandom.classList.toggle('active', d.random === '1');
 
+        let ssBtnRandom = document.getElementById('ssBtnRandom');
+        if(ssBtnRandom) ssBtnRandom.classList.toggle('active', d.random === '1');
+
         let ssBtnPlay = document.getElementById('ssBtnPlay');
-        if(ssBtnPlay) ssBtnPlay.innerHTML = d.state === 'play' ? '<i class="bi bi-pause-fill"></i>' : '<i class="bi bi-play-fill"></i>';
+        let newSsIcon = d.state === 'play' ? '<i class="bi bi-pause-fill"></i>' : '<i class="bi bi-play-fill"></i>';
+        if(ssBtnPlay && ssBtnPlay.innerHTML !== newSsIcon) ssBtnPlay.innerHTML = newSsIcon;
 
         let camillaTgl = document.getElementById('camillaDspToggle');
         if (camillaTgl) {
@@ -1034,20 +1148,112 @@ function updateNowPlaying(d) {
 }
 
 async function sendCmd(cmd, param = '', type = '') { 
-    let url = `${API}?action=command&cmd=${cmd}&param=${encodeURIComponent(param)}`; 
+    let btnPlay = document.getElementById('btnPlay');
+    let isCurrentlyPlaying = btnPlay && btnPlay.innerHTML.includes('pause-fill');
+    let finalCmd = cmd;
+
+    // Bypass rapido per toggle (decide se mettere in pausa o stop)
+    if (cmd === 'toggle') {
+        let isStream = window.lastPlayedFile && (
+            window.lastPlayedFile.startsWith('http') || 
+            window.lastPlayedFile.toUpperCase().includes('RADIO')
+        );
+        finalCmd = isCurrentlyPlaying ? (isStream ? 'stop' : 'pause') : 'play';
+    }
+
+    // Raggruppamento delle azioni per semplificare la logica
+    let isPlayAction = ['play', 'next', 'previous', 'playid'].includes(finalCmd);
+    let isStopAction = ['pause', 'stop'].includes(finalCmd);
+
+    if (isPlayAction || isStopAction) {
+        
+        // 1. Aggiornamento UI Immediato e Uniformato
+        let newIcon = isPlayAction 
+            ? '<i class="bi bi-pause-fill"></i>' 
+            : '<i class="bi bi-play-fill"></i>';
+        
+        ['btnPlay', 'ssBtnPlay', 'mpBtnPlay'].forEach(id => {
+            let btn = document.getElementById(id);
+            if (btn && btn.innerHTML !== newIcon) {
+                btn.innerHTML = newIcon;
+            }
+        });
+
+        // 2. Gestione Sincronizzata del Player Locale (Svuota buffer e ricarica)
+        let localPlayer = document.getElementById('localAudioPlayer');
+        
+        if (localPlayer && typeof isStreamingActive !== 'undefined' && isStreamingActive) {
+            
+            if (isStopAction) {
+                // Ferma e svuota il buffer di colpo
+                localPlayer.pause();
+                localPlayer.removeAttribute('src');
+                localPlayer.load();
+                if(typeof disconnectLocalAnalyzer === 'function') disconnectLocalAnalyzer();
+                
+            } else if (isPlayAction) {
+                // Per Next, Prev e PlayID dobbiamo obbligare il browser a tagliare il buffer 
+                // della traccia vecchia prima di ricaricare il flusso HTTP dal server.
+                if (['next', 'previous', 'playid'].includes(finalCmd)) {
+                    localPlayer.pause();
+                    localPlayer.removeAttribute('src');
+                    localPlayer.load();
+                }
+
+                // Fai ripartire lo stream fresco con nuovo timestamp anticascata
+                let streamUrl = document.getElementById('streamUrlInput') ? document.getElementById('streamUrlInput').value : '';
+                if (streamUrl) {
+                    localPlayer.src = streamUrl + "?t=" + new Date().getTime();
+                    localPlayer.play().then(() => {
+                        if(typeof connectLocalAnalyzer === 'function') connectLocalAnalyzer();
+                    }).catch(e => console.log("Attesa interazione utente per l'audio locale", e));
+                }
+            }
+        }
+    }
+
+    // Invio comando al server in background
+    let url = `${API}?action=command&cmd=${finalCmd}&param=${encodeURIComponent(param)}`; 
     if(type) url += `&type=${encodeURIComponent(type)}`; 
-    await fetch(url); 
-    fetchStatus(); 
+    
+    fetch(url).then(() => fetchStatus()).catch(e => console.error(e)); 
 }
 
 function playAdd(path, type = 'file', mode = 'play') { 
     if (event) event.stopPropagation(); 
     let url = `${API}?action=command&cmd=addplay&param=${encodeURIComponent(path)}&type=${encodeURIComponent(type)}&mode=${mode}`; 
+    
+    if (mode === 'play') {
+        // Uniforma l'icona Play subito
+        let newIcon = '<i class="bi bi-pause-fill"></i>';
+        ['btnPlay', 'ssBtnPlay', 'mpBtnPlay'].forEach(id => {
+            let btn = document.getElementById(id);
+            if (btn && btn.innerHTML !== newIcon) btn.innerHTML = newIcon;
+        });
+
+        // Svuota buffer se siamo in cuffia
+        let localPlayer = document.getElementById('localAudioPlayer');
+        if (localPlayer && typeof isStreamingActive !== 'undefined' && isStreamingActive) {
+            localPlayer.pause();
+            localPlayer.removeAttribute('src');
+            localPlayer.load();
+            
+            let streamUrl = document.getElementById('streamUrlInput') ? document.getElementById('streamUrlInput').value : '';
+            if (streamUrl) {
+                localPlayer.src = streamUrl + "?t=" + new Date().getTime();
+                localPlayer.play().then(() => {
+                    if(typeof connectLocalAnalyzer === 'function') connectLocalAnalyzer();
+                }).catch(e => console.log("Attesa interazione utente", e));
+            }
+        }
+        
+        switchTab('nowplaying'); 
+    }
+
     fetch(url).then(() => { 
         fetchStatus(); 
         if(mode === 'enqueue') alert(t('msg_added_queue')); 
     }); 
-    if(mode === 'play') switchTab('nowplaying'); 
 }
 
 function seekTrack(e) { 
@@ -1099,7 +1305,12 @@ function toggleLocalStream() {
         }).catch(e => alert(t('msg_stream_error') + e.message));
     } else {
         player.pause();
-        player.src = '';
+        
+        // --- INIZIO MODIFICA: Svuotamento istantaneo del buffer ---
+        player.removeAttribute('src'); 
+        player.load(); 
+        // --- FINE MODIFICA ---
+
         btn.style.color = '#aaa';
         btn.style.textShadow = 'none';
         isStreamingActive = false;

@@ -54,6 +54,7 @@ const translations = {
         "lbl_show_inline_vu": "VU Meter nel Player", "lbl_backlight": "Luce Pannello Screensaver", 
         "lbl_local_analyzer": "Analizzatore Audio Locale",
         "lbl_keep_ss_style": "Mantieni tema ruotato all'uscita dal SS",
+        "lbl_wake_on_track": "Risveglio al cambio brano (Mostra Copertina)",
         
         "vu_blue_mod70": "Blue Classic Mod. 70",
         "vu_blue_mono_mod1000": "Blue Mono Mod. 1000",
@@ -99,7 +100,15 @@ const translations = {
         "lbl_ss_random_def": "Rotazione Stili Casuale",
         "btn_save_defaults": "Salva come Predefinito per i Nuovi Client",
         "hdr_diagnostics": "Diagnostica API Bridge",
-        "btn_run_tests": "Esegui Nuovamente"
+        "btn_run_tests": "Esegui Nuovamente",
+        "hdr_local_device": "Configurazione Dispositivo Locale",
+        "desc_local_device": "Salva le impostazioni attuali di questo dispositivo sul server tramite il tuo IP. In questo modo la configurazione non verrà mai persa, anche se svuoti la cache o ricarichi la pagina.",
+        "btn_save_client": "Salva Configurazione",
+        "btn_restore_defaults": "Ripristina Valori di Default",
+        "msg_config_saved": "Configurazione Salvata!",
+        "confirm_restore_defaults": "Vuoi eliminare la configurazione permanente di questo dispositivo e ripristinare i valori globali?",
+        "msg_save_error": "Errore durante il salvataggio.",
+        "msg_restore_error": "Errore durante il ripristino."
     },
     en: {
         "tab_player": "Player", "tab_queue": "Queue", "tab_favs": "Favorites",
@@ -156,6 +165,7 @@ const translations = {
         "lbl_show_inline_vu": "VU Meter in Player", "lbl_backlight": "Screensaver Panel Backlight", 
         "lbl_local_analyzer": "Local Audio Analyzer",
         "lbl_keep_ss_style": "Keep rotated theme on SS exit",
+        "lbl_wake_on_track": "Wake on track change (Show Cover)",
         
         "vu_blue_mod70": "Blue Classic Mod. 70",
         "vu_blue_mono_mod1000": "Blue Mono Mod. 1000",
@@ -201,7 +211,15 @@ const translations = {
         "lbl_ss_random_def": "Random Style Rotation",
         "btn_save_defaults": "Save as Default for New Clients",
         "hdr_diagnostics": "API Bridge Diagnostics",
-        "btn_run_tests": "Run Again"
+        "btn_run_tests": "Run Again",
+        "hdr_local_device": "Local Device Configuration",
+        "desc_local_device": "Save this device's current settings on the server via your IP. This ensures the configuration is never lost, even if you clear the cache or reload the page.",
+        "btn_save_client": "Save Configuration",
+        "btn_restore_defaults": "Restore Default Values",
+        "msg_config_saved": "Configuration Saved!",
+        "confirm_restore_defaults": "Do you want to delete this device's permanent configuration and restore global defaults?",
+        "msg_save_error": "Error during save.",
+        "msg_restore_error": "Error during restore."
     },
     es: {
         "tab_player": "Reproductor", "tab_queue": "Cola", "tab_favs": "Favoritos",
@@ -258,6 +276,7 @@ const translations = {
         "lbl_show_inline_vu": "VU Meter en el Reproductor", "lbl_backlight": "Luz de Panel de Salvapantallas", 
         "lbl_local_analyzer": "Analizador de Audio Local",
         "lbl_keep_ss_style": "Mantener tema rotado al salir del SS",
+        "lbl_wake_on_track": "Despertar al cambiar de pista (Mostrar Carátula)",
         
         "vu_blue_mod70": "Blue Classic Mod. 70",
         "vu_blue_mono_mod1000": "Blue Mono Mod. 1000",
@@ -303,7 +322,15 @@ const translations = {
         "lbl_ss_random_def": "Rotación de Estilos Aleatoria",
         "btn_save_defaults": "Guardar como Predeterminado para Nuevos Clientes",
         "hdr_diagnostics": "Diagnóstico de la API Bridge",
-        "btn_run_tests": "Ejecutar de Nuevo"
+        "btn_run_tests": "Ejecutar de Nuevo",
+        "hdr_local_device": "Configuración del Dispositivo Local",
+        "desc_local_device": "Guarda los ajustes actuales de este dispositivo en el servidor mediante tu IP. De esta manera, la configuración nunca se perderá, incluso si borras la caché o recargas la página.",
+        "btn_save_client": "Guardar Configuración",
+        "btn_restore_defaults": "Restaurar Valores Predeterminados",
+        "msg_config_saved": "¡Configuración Guardada!",
+        "confirm_restore_defaults": "¿Deseas eliminar la configuración permanente de este dispositivo y restaurar los valores globales?",
+        "msg_save_error": "Error al guardar.",
+        "msg_restore_error": "Error al restaurar."
     },
     fr: {
         "tab_player": "Lecteur", "tab_queue": "File d'attente", "tab_favs": "Favoris",
@@ -340,7 +367,7 @@ const translations = {
         "sync_desc2": "Cette opération peut prendre quelques minutes.",
         "btn_sync": "Synchroniser", "btn_save_playlist": "Enregistrer la liste", "btn_clear": "Vider",
         "btn_save": "Enregistrer", "btn_up": "Haut", "btn_back": "Retour", "btn_search": "RECHERCHER",
-        "btn_space": "ESPACE", "btn_test_ss": "Tester l'économiseur", "btn_close_moode": "Retour au Rack",
+        "btn_space": "ESPACIO", "btn_test_ss": "Tester l'économiseur", "btn_close_moode": "Retour au Rack",
         "btn_play": "Lecture",
         "btn_export": "Exporter Config", "btn_import": "Importer Config",
         "desc_backup": "Enregistrez vos radios, favoris et paramètres dans un fichier local.",
@@ -360,6 +387,7 @@ const translations = {
         "lbl_show_inline_vu": "VU-mètre dans le lecteur", "lbl_backlight": "Rétroéclairage du panneau", 
         "lbl_local_analyzer": "Analyseur audio local",
         "lbl_keep_ss_style": "Garder le thème rotatif à la sortie du SS",
+        "lbl_wake_on_track": "Réveil au changement de piste (Afficher la pochette)",
         
         "vu_blue_mod70": "Blue Classic Mod. 70",
         "vu_blue_mono_mod1000": "Blue Mono Mod. 1000",
@@ -405,6 +433,14 @@ const translations = {
         "lbl_ss_random_def": "Rotation aléatoire des styles",
         "btn_save_defaults": "Enregistrer comme Défaut pour les Nouveaux Clients",
         "hdr_diagnostics": "Diagnostics de l'API Bridge",
-        "btn_run_tests": "Exécuter à Nouveau"
+        "btn_run_tests": "Exécuter à Nouveau",
+        "hdr_local_device": "Configuration de l'Appareil Local",
+        "desc_local_device": "Enregistrez les paramètres actuels de cet appareil sur le serveur via votre IP. Ainsi, la configuration ne sera jamais perdue, même si vous videz le cache ou rechargez la page.",
+        "btn_save_client": "Enregistrer la Configuration",
+        "btn_restore_defaults": "Restaurer les Valeurs par Défaut",
+        "msg_config_saved": "Configuration Enregistrée !",
+        "confirm_restore_defaults": "Voulez-vous supprimer la configuration permanente de cet appareil et restaurer les valeurs globales ?",
+        "msg_save_error": "Erreur lors de l'enregistrement.",
+        "msg_restore_error": "Erreur lors de la restauration."
     }
 };

@@ -146,6 +146,10 @@
                     <span style="font-size: 12px; color: #fff;">Mostra Mini Player nel Salvaschermo</span>
                     <label class="simple-switch"><input type="checkbox" id="defMiniPlayerSs"><span class="slider"></span></label>
                 </div>
+                <div class="simple-switch-wrapper" style="margin-bottom: 0.5rem; padding: 6px 10px;">
+                    <span style="font-size: 12px; color: #fff;">Risveglio al cambio brano (Mostra Copertina)</span>
+                    <label class="simple-switch"><input type="checkbox" id="defWakeOnTrack"><span class="slider"></span></label>
+                </div>
             </div>
 
             <!-- BLOCCO 2: CONNESSIONI E INDIRIZZI -->
@@ -249,6 +253,7 @@
                     document.getElementById('defLocalAnalyzer').checked = d.localAnalyzer !== false;
                     document.getElementById('defKeepSsStyle').checked = d.keepSsStyle === true;
                     document.getElementById('defMiniPlayerSs').checked = d.miniPlayerSs !== false;
+                    document.getElementById('defWakeOnTrack').checked = d.wakeOnTrack !== false;
                     document.getElementById('defWsUri').value = d.wsUri || '';
                     document.getElementById('defStreamUrl').value = d.streamUrl || '';
                     document.getElementById('defMoodeUrl').value = d.moodeUrl || '';
@@ -277,6 +282,7 @@
                 localAnalyzer: document.getElementById('defLocalAnalyzer').checked,
                 keepSsStyle: document.getElementById('defKeepSsStyle').checked,
                 miniPlayerSs: document.getElementById('defMiniPlayerSs').checked,
+                wakeOnTrack: document.getElementById('defWakeOnTrack').checked,
                 wsUri: document.getElementById('defWsUri').value.trim(),
                 streamUrl: document.getElementById('defStreamUrl').value.trim(),
                 moodeUrl: document.getElementById('defMoodeUrl').value.trim()

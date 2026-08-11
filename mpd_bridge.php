@@ -215,7 +215,52 @@ try {
     if ($action === 'set_default_settings') {
         $json = file_get_contents('php://input');
         $data = json_decode($json, true);
+        // --- GESTIONE CONFIGURAZIONI CLIENT SPECIFICHE ---
+    if ($action === 'save_client_settings') {
+        $json = file_get_contents('php://input');
+        $data = json_decode($json, true);
         
+        if ($data !== null) {
+            if (!is_dir(HIFI_CACHE_DIR)) {
+                @mkdir(HIFI_CACHE_DIR, 0775, true);
+            }
+            $client_ip = $_SERVER['REMOTE_ADDR'];
+            $file = HIFI_CACHE_DIR . '/client_' . md5($client_ip) . '.json';
+            
+            if (file_put_contents($file, json_encode($data, JSON_PRETTY_PRINT))) {
+                echo json_encode(['success' => true]);
+            } else {
+                echo json_encode(['success' => false, 'error' => 'Impossibile scrivere il file.']);
+            }
+        } else {
+            echo json_encode(['success' => false, 'error' => 'Payload JSON non valido.']);
+        }
+        exit;
+    }
+
+    if ($action === 'get_client_settings') {
+        $client_ip = $_SERVER['REMOTE_ADDR'];
+        $file = HIFI_CACHE_DIR . '/client_' . md5($client_ip) . '.json';
+        
+        if (file_exists($file)) {
+            echo file_get_contents($file);
+        } else {
+            echo json_encode(['success' => false, 'error' => 'Not found']);
+        }
+        exit;
+    }
+
+    if ($action === 'delete_client_settings') {
+        $client_ip = $_SERVER['REMOTE_ADDR'];
+        $file = HIFI_CACHE_DIR . '/client_' . md5($client_ip) . '.json';
+        
+        if (file_exists($file)) {
+            @unlink($file);
+        }
+        echo json_encode(['success' => true]);
+        exit;
+    }
+
         if ($data !== null) {
             if (!is_dir(HIFI_CACHE_DIR)) {
                 @mkdir(HIFI_CACHE_DIR, 0775, true);
@@ -881,6 +926,7 @@ try {
             }
         }
         else if ($cmd === 'play') $mpd_cmd = 'play';
+        else if ($cmd === 'stop') $mpd_cmd = 'stop'; 
         else if ($cmd === 'pause') {
             $song_raw = send_mpd_command($socket, 'currentsong');
             $file = '';

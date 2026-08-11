@@ -85,12 +85,24 @@
 
     <!-- NUOVO: MINI-PLAYER OVERLAY DEL SALVASCHERMO -->
     <div id="ssControlsOverlay" class="ss-controls-overlay" style="opacity: 0; pointer-events: none;">
+        
+        <!-- Pulsante Repeat Salvaschermo -->
+        <button class="icon-btn" id="ssBtnRepeat" onclick="resetSsControlsTimer(); sendCmd('repeat', currentRepeat === '1' ? '0' : '1'); event.stopPropagation();" title="Repeat">
+            <i class="bi bi-repeat"></i>
+        </button>
+
         <button class="icon-btn" onclick="resetSsControlsTimer(); sendCmd('previous'); event.stopPropagation();"><i class="bi bi-skip-end-fill" style="transform: scaleX(-1); display:inline-block;"></i></button>
         <button class="icon-btn play-btn" id="ssBtnPlay" onclick="resetSsControlsTimer(); sendCmd('toggle'); event.stopPropagation();"><i class="bi bi-pause-fill"></i></button>
         <button class="icon-btn" onclick="resetSsControlsTimer(); sendCmd('next'); event.stopPropagation();"><i class="bi bi-skip-end-fill"></i></button>
+        
+        <!-- Pulsante Random Salvaschermo -->
+        <button class="icon-btn" id="ssBtnRandom" onclick="resetSsControlsTimer(); sendCmd('random', currentRandom === '1' ? '0' : '1'); event.stopPropagation();" title="Random">
+            <i class="bi bi-shuffle"></i>
+        </button>
+
         <div class="ss-divider"></div>
      
-    <!-- NUOVO PULSANTE DI USCITA -->
+        <!-- PULSANTE DI USCITA -->
         <button id="btnExitScreensaver" onclick="exitScreensaver(); event.stopPropagation();" title="Esci dal Salvaschermo">
             <i class="bi bi-box-arrow-right"></i>
         </button>
@@ -405,8 +417,22 @@
                     <div class="hint" style="margin-top: 5px; font-size: 0.8rem; color: #888;" data-i18n="desc_backup">
                          Salva le tue radio, preferiti e impostazioni in un file locale.
                     </div>
-               </div>
+                </div>
 
+                <!-- BLOCCO CONFIGURAZIONE DISPOSITIVO PERMANENTE -->
+                <div class="settings-card">
+                    <h3><i class="bi bi-device-ssd"></i> <span data-i18n="hdr_local_device">Configurazione Dispositivo Locale</span></h3>
+                    <p class="hint" style="margin-bottom: 15px; color: #ccc;" data-i18n="desc_local_device">Salva le impostazioni attuali di questo dispositivo sul server tramite il tuo IP. In questo modo la configurazione non verrà mai persa, anche se svuoti la cache o ricarichi la pagina.</p>
+                    <div style="display: flex; gap: 10px;">
+                        <button id="btnSaveClient" onclick="saveClientSettings()" class="btn-addplay" style="flex:1; background:var(--hl-color); color:#000; border:none; font-weight:bold;">
+                            <i class="bi bi-floppy-fill"></i> <span data-i18n="btn_save_client">Salva Configurazione</span>
+                        </button>
+                        <button onclick="restoreDefaultSettings()" class="btn-addplay" style="flex:1; background:rgba(220,53,69,0.15); color:#ff6b6b; border-color:rgba(220,53,69,0.4);">
+                            <i class="bi bi-arrow-counterclockwise"></i> <span data-i18n="btn_restore_defaults">Ripristina Valori di Default</span>
+                        </button>
+                    </div>
+                </div>
+ 
                 <!-- BLOCCO 1: GESTIONE AUDIO E DSP -->
                 <div class="settings-card">
                     <h3><i class="bi bi-sliders"></i> <span data-i18n="hdr_dsp">DSP & Audio Processing</span></h3>
@@ -522,6 +548,13 @@
                         <span style="font-size: 12px; color: #fff;" data-i18n="lbl_mini_player_ss">Mostra Mini Player nel Salvaschermo</span>
                         <label class="simple-switch">
                         <input type="checkbox" id="miniPlayerSsToggle" onchange="aggiornaMiniPlayerSS()">
+                        <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="simple-switch-wrapper" style="margin-top: 0.5rem; padding: 6px 10px;">
+                        <span style="font-size: 12px; color: #fff;" data-i18n="lbl_wake_on_track">Risveglio al cambio brano (Mostra Copertina)</span>
+                        <label class="simple-switch">
+                        <input type="checkbox" id="wakeOnTrackToggle" onchange="saveSettings()">
                         <span class="slider"></span>
                         </label>
                     </div>
