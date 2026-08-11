@@ -680,7 +680,6 @@ async function fetchStatus() {
     if (statusAbortController) statusAbortController.abort();
     statusAbortController = new AbortController();
     
-    // Timeout di 3 secondi per capire se MPD è bloccato
     const timeoutId = setTimeout(() => statusAbortController.abort(), 3000);
 
     try {
@@ -690,15 +689,10 @@ async function fetchStatus() {
         if (!res.ok) throw new Error('Network error');
         let d = await res.json();
         
-        // --- GESTIONE VOLUME E TRIGGER OSD ---
         if (d.volume !== undefined) {
             let incomingVol = parseInt(d.volume);
             
-            // Se il volume del server è diverso dall'ultimo che conoscevamo
             if (lastKnownVolume !== -1 && lastKnownVolume !== incomingVol) {
-                
-                // Mostra l'OSD solo se sono passati almeno 2 secondi dall'ultima 
-                // volta che hai toccato lo slider a mano (evita il rimbalzo)
                 if (Date.now() - lastLocalVolumeChange > 2000) {
                     let volSld = document.getElementById('volSlider');
                     if (volSld) volSld.value = incomingVol;
@@ -707,56 +701,53 @@ async function fetchStatus() {
                     lastKnownVolume = incomingVol;
                 }
             } else if (lastKnownVolume === -1) {
-                // Inizializzazione al primo caricamento
                 lastKnownVolume = incomingVol;
             }
         }
         
-        // --- Aggiornamento Stato Play/Pausa Ottimizzato ---
+        // --- FIX GLITCH ICONE ---
         if (d.state) {
-            let newIcon = d.state === 'play' ? '<i class="bi bi-pause-fill"></i>' : '<i class="bi bi-play-fill"></i>';
+            let isPlay = (d.state === 'play');
             ['btnPlay', 'ssBtnPlay', 'mpBtnPlay'].forEach(id => {
                 let btn = document.getElementById(id);
-                if (btn && btn.innerHTML !== newIcon) {
-                    btn.innerHTML = newIcon;
+                if (btn) {
+                    let hasPause = btn.innerHTML.includes('pause-fill');
+                    if (isPlay && !hasPause) {
+                        btn.innerHTML = '<i class="bi bi-pause-fill"></i>';
+                    } else if (!isPlay && hasPause) {
+                        btn.innerHTML = '<i class="bi bi-play-fill"></i>';
+                    }
                 }
             });
         }
         
-        // Richiama l'aggiornamento grafico
         if (typeof updateNowPlaying === 'function') {
             updateNowPlaying(d);
         }
         
     } catch (e) {
-        // ===============================================================
-        // GESTIONE OFFLINE: Intercetta il timeout o l'assenza di rete
-        // ===============================================================
         let isStream = window.lastPlayedFile && (window.lastPlayedFile.startsWith('http') || window.lastPlayedFile.toUpperCase().includes('RADIO'));
         
         if (isStream && (e.name === 'AbortError' || !navigator.onLine)) {
-            
-            // 1. Forza l'uscita dal salvaschermo se l'utente era lì
             if (typeof exitScreensaver === 'function' && typeof ssActive !== 'undefined' && ssActive) {
                 exitScreensaver();
             }
 
-            // 2. Aggiorna visivamente il player senza bloccare il browser con alert
             let mainTitle = document.getElementById('mainTitle');
             if (mainTitle && mainTitle.textContent !== t('msg_network_error')) {
-                mainTitle.textContent = t('msg_network_error'); // Usa la traduzione
+                mainTitle.textContent = t('msg_network_error');
                 mainTitle.style.color = "#ff3d00"; 
                 setTimeout(() => { mainTitle.style.color = ""; }, 5000); 
             }
             
             let ssTrackInfo = document.getElementById('ssTrackInfo');
-            if (ssTrackInfo) ssTrackInfo.textContent = t('msg_offline'); // Usa la traduzione
+            if (ssTrackInfo) ssTrackInfo.textContent = t('msg_offline'); 
             
             let btnPlay = document.getElementById('btnPlay');
-            let newIcon = '<i class="bi bi-play-fill"></i>';
-            if(btnPlay && btnPlay.innerHTML !== newIcon) btnPlay.innerHTML = newIcon;
+            if(btnPlay && !btnPlay.innerHTML.includes('play-fill')) {
+                btnPlay.innerHTML = '<i class="bi bi-play-fill"></i>';
+            }
 
-            // 3. Invia il comando di STOP in background per sganciare MPD dal loop
             fetch(`${API}?action=command&cmd=stop`).catch(() => {});
         }
     } finally {
@@ -790,10 +781,6 @@ function updateNowPlaying(d) {
             let mpA = document.getElementById('mpArtist');
             if(mpA) mpA.textContent = safeArtist;
             
-            let mpBP = document.getElementById('mpBtnPlay');
-            let newMpIcon = d.state === 'play' ? '<i class="bi bi-pause-fill"></i>' : '<i class="bi bi-play-fill"></i>';
-            if(mpBP && mpBP.innerHTML !== newMpIcon) mpBP.innerHTML = newMpIcon;
-            
             let progEl = document.getElementById('mpProgress'); 
             if(progEl) progEl.style.width = (currentDuration > 0 ? ((d.elapsed || 0) / currentDuration) * 100 : 0) + '%';
         }
@@ -810,10 +797,12 @@ function updateNowPlaying(d) {
             fileUpper.endsWith('.M3U8')
         );
 
-        // --- 1. RILEVAMENTO CAMBIO TRACCIA ---
+        // --- FIX GLITCH AVVIO E CAMBIO TRACCIA ---
+        let isFirstLoad = false;
         if (typeof window.lastPlayedFile === 'undefined') {
             window.lastPlayedFile = fileStr;
             window.lastPlayedTitle = safeTitle;
+            isFirstLoad = true;
         }
 
         let fileChanged = (window.lastPlayedFile !== fileStr);
@@ -822,23 +811,19 @@ function updateNowPlaying(d) {
         window.lastPlayedFile = fileStr;
         window.lastPlayedTitle = safeTitle;
 
-        // --- 2. AZIONE: RITORNO AL PLAYER (CON ECCEZIONE RADIO E INTERRUTTORE) ---
         let shouldWakeUp = false;
         
-        if (isStream) {
-            // Radio: sveglia l'interfaccia SOLO se cambia la stazione (URL)
-            shouldWakeUp = fileChanged;
-        } else {
-            // Audio locale: sveglia l'interfaccia se cambia il file o il titolo
-            shouldWakeUp = (fileChanged || titleChanged);
+        if (!isFirstLoad) {
+            if (isStream) {
+                shouldWakeUp = fileChanged;
+            } else {
+                shouldWakeUp = (fileChanged || titleChanged);
+            }
         }
 
-        // Legge lo stato dell'interruttore (di default è acceso)
         let wakeEnabled = localStorage.getItem('camilla_wake_on_track') !== 'false';
 
-        // Scatta solo se il cambio traccia lo richiede E se l'interruttore è acceso
         if (shouldWakeUp && wakeEnabled) {
-            
             if (typeof ssActive !== 'undefined' && ssActive) {
                 if (typeof exitScreensaver === 'function') exitScreensaver();
             }
@@ -1091,10 +1076,6 @@ function updateNowPlaying(d) {
         let ssBtnRandom = document.getElementById('ssBtnRandom');
         if(ssBtnRandom) ssBtnRandom.classList.toggle('active', d.random === '1');
 
-        let ssBtnPlay = document.getElementById('ssBtnPlay');
-        let newSsIcon = d.state === 'play' ? '<i class="bi bi-pause-fill"></i>' : '<i class="bi bi-play-fill"></i>';
-        if(ssBtnPlay && ssBtnPlay.innerHTML !== newSsIcon) ssBtnPlay.innerHTML = newSsIcon;
-
         let camillaTgl = document.getElementById('camillaDspToggle');
         if (camillaTgl) {
             let wrapper = camillaTgl.closest('.simple-switch-wrapper');
@@ -1162,7 +1143,6 @@ async function sendCmd(cmd, param = '', type = '') {
     let isCurrentlyPlaying = btnPlay && btnPlay.innerHTML.includes('pause-fill');
     let finalCmd = cmd;
 
-    // Bypass rapido per toggle (decide se mettere in pausa o stop)
     if (cmd === 'toggle') {
         let isStream = window.lastPlayedFile && (
             window.lastPlayedFile.startsWith('http') || 
@@ -1171,91 +1151,46 @@ async function sendCmd(cmd, param = '', type = '') {
         finalCmd = isCurrentlyPlaying ? (isStream ? 'stop' : 'pause') : 'play';
     }
 
-    // Raggruppamento delle azioni per semplificare la logica
     let isPlayAction = ['play', 'next', 'previous', 'playid'].includes(finalCmd);
     let isStopAction = ['pause', 'stop'].includes(finalCmd);
 
     if (isPlayAction || isStopAction) {
-        
-        // 1. Aggiornamento UI Immediato e Uniformato
-        let newIcon = isPlayAction 
-            ? '<i class="bi bi-pause-fill"></i>' 
-            : '<i class="bi bi-play-fill"></i>';
-        
+        // --- Aggiornamento Visivo Istantaneo ---
+        let isPlay = isPlayAction;
         ['btnPlay', 'ssBtnPlay', 'mpBtnPlay'].forEach(id => {
             let btn = document.getElementById(id);
-            if (btn && btn.innerHTML !== newIcon) {
-                btn.innerHTML = newIcon;
+            if (btn) {
+                let hasPause = btn.innerHTML.includes('pause-fill');
+                if (isPlay && !hasPause) {
+                    btn.innerHTML = '<i class="bi bi-pause-fill"></i>';
+                } else if (!isPlay && hasPause) {
+                    btn.innerHTML = '<i class="bi bi-play-fill"></i>';
+                }
             }
         });
-
-        // 2. Gestione Sincronizzata del Player Locale (Svuota buffer e ricarica)
-        let localPlayer = document.getElementById('localAudioPlayer');
-        
-        if (localPlayer && typeof isStreamingActive !== 'undefined' && isStreamingActive) {
-            
-            if (isStopAction) {
-                // Ferma e svuota il buffer di colpo
-                localPlayer.pause();
-                localPlayer.removeAttribute('src');
-                localPlayer.load();
-                if(typeof disconnectLocalAnalyzer === 'function') disconnectLocalAnalyzer();
-                
-            } else if (isPlayAction) {
-                // Per Next, Prev e PlayID dobbiamo obbligare il browser a tagliare il buffer 
-                // della traccia vecchia prima di ricaricare il flusso HTTP dal server.
-                if (['next', 'previous', 'playid'].includes(finalCmd)) {
-                    localPlayer.pause();
-                    localPlayer.removeAttribute('src');
-                    localPlayer.load();
-                }
-
-                // Fai ripartire lo stream fresco con nuovo timestamp anticascata
-                let streamUrl = document.getElementById('streamUrlInput') ? document.getElementById('streamUrlInput').value : '';
-                if (streamUrl) {
-                    localPlayer.src = streamUrl + "?t=" + new Date().getTime();
-                    localPlayer.play().then(() => {
-                        if(typeof connectLocalAnalyzer === 'function') connectLocalAnalyzer();
-                    }).catch(e => console.log("Attesa interazione utente per l'audio locale", e));
-                }
-            }
-        }
     }
 
-    // Invio comando al server in background
+    // --- RIMOSSA INTERFERENZA COL BUFFER ---
+    // Invia solo il comando ad MPD e lascia scorrere il flusso audio naturale
     let url = `${API}?action=command&cmd=${finalCmd}&param=${encodeURIComponent(param)}`; 
     if(type) url += `&type=${encodeURIComponent(type)}`; 
     
     fetch(url).then(() => fetchStatus()).catch(e => console.error(e)); 
 }
 
+
 function playAdd(path, type = 'file', mode = 'play') { 
     if (event) event.stopPropagation(); 
     let url = `${API}?action=command&cmd=addplay&param=${encodeURIComponent(path)}&type=${encodeURIComponent(type)}&mode=${mode}`; 
     
     if (mode === 'play') {
-        // Uniforma l'icona Play subito
-        let newIcon = '<i class="bi bi-pause-fill"></i>';
+        // --- Aggiornamento Visivo Istantaneo ---
         ['btnPlay', 'ssBtnPlay', 'mpBtnPlay'].forEach(id => {
             let btn = document.getElementById(id);
-            if (btn && btn.innerHTML !== newIcon) btn.innerHTML = newIcon;
-        });
-
-        // Svuota buffer se siamo in cuffia
-        let localPlayer = document.getElementById('localAudioPlayer');
-        if (localPlayer && typeof isStreamingActive !== 'undefined' && isStreamingActive) {
-            localPlayer.pause();
-            localPlayer.removeAttribute('src');
-            localPlayer.load();
-            
-            let streamUrl = document.getElementById('streamUrlInput') ? document.getElementById('streamUrlInput').value : '';
-            if (streamUrl) {
-                localPlayer.src = streamUrl + "?t=" + new Date().getTime();
-                localPlayer.play().then(() => {
-                    if(typeof connectLocalAnalyzer === 'function') connectLocalAnalyzer();
-                }).catch(e => console.log("Attesa interazione utente", e));
+            if (btn && !btn.innerHTML.includes('pause-fill')) {
+                btn.innerHTML = '<i class="bi bi-pause-fill"></i>';
             }
-        }
+        });
         
         switchTab('nowplaying'); 
     }
@@ -1314,13 +1249,9 @@ function toggleLocalStream() {
             if(typeof connectLocalAnalyzer === 'function') connectLocalAnalyzer();
         }).catch(e => alert(t('msg_stream_error') + e.message));
     } else {
+        // --- CHIUSURA MORBIDA DEL FLUSSO ORIGINALE ---
         player.pause();
-        
-        // --- INIZIO MODIFICA: Svuotamento istantaneo del buffer ---
-        player.removeAttribute('src'); 
-        player.load(); 
-        // --- FINE MODIFICA ---
-
+        player.src = ''; 
         btn.style.color = '#aaa';
         btn.style.textShadow = 'none';
         isStreamingActive = false;
@@ -2175,9 +2106,6 @@ function importConfig(input) {
     reader.readAsText(file);
 }
 
-// ==========================================
-// AGGIORNAMENTO DINAMICO MENU A TENDINA
-// ==========================================
 setInterval(() => {
     try {
         let labels = JSON.parse(localStorage.getItem('customLabels') || '{}');
@@ -2215,7 +2143,7 @@ function initKdsiEngine() {
         ctx.restore();
     }
 
-    function renderKDSI(ctx, value, label) {
+        function renderKDSI(ctx, value, label) {
         const cx = 180, cy = 255; 
         const rTop = 152, rBot = 146;
         const sAng = -Math.PI * 0.73, eAng = -Math.PI * 0.27;
@@ -2267,6 +2195,7 @@ function initKdsiEngine() {
         ctx.strokeStyle = "#050505"; ctx.lineWidth = 1.8; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + nCos * needleL, cy + nSin * needleL); ctx.stroke();
     }
 
+
     function renderPlayerKDSI() {
         let styleSelect = document.getElementById('vuStyleSelect');
         let isKdsi = styleSelect && styleSelect.value === 'kdsi_round';
@@ -2279,7 +2208,7 @@ function initKdsiEngine() {
             if (isKdsi) {
                 let mode = (typeof currentLayoutMode !== 'undefined') ? currentLayoutMode : 'desktop';
                 if (mode !== 'mobile') {
-                    kdsiCont.style.display = 'flex'; // Ora mostra il Wrapper con altezza fissa
+                    kdsiCont.style.display = 'flex'; 
                     if(cvsL) cvsL.style.display = 'none'; 
                     if(cvsR) cvsR.style.display = 'none'; 
                     if(cvsS) cvsS.style.display = 'none';

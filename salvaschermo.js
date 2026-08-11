@@ -97,35 +97,7 @@ function disconnectLocalAnalyzer() {
     if (!camillaWs) { targetL = 0; targetR = 0; targetSingle = 0; }
 }
 
-function toggleLocalStream() {
-    let player = document.getElementById('localAudioPlayer');
-    let btn = document.getElementById('btnLocalStream');
-    let streamUrl = document.getElementById('streamUrlInput').value;
 
-    if (!streamUrl) { alert("Imposta l'URL dello streaming HTTP nelle Impostazioni!"); return; }
-
-    if (player.paused) {
-        player.src = streamUrl + "?t=" + new Date().getTime();
-        player.play().then(() => {
-            btn.style.color = 'var(--hl-color)';
-            btn.style.textShadow = '0 0 10px var(--hl-glow)';
-            isStreamingActive = true;
-            disconnectCamilla();
-            connectLocalAnalyzer();
-        }).catch(e => alert("Impossibile connettersi allo stream: " + e.message));
-    } else {
-        player.pause();
-        player.src = '';
-        btn.style.color = '#aaa';
-        btn.style.textShadow = 'none';
-        isStreamingActive = false;
-        disconnectLocalAnalyzer();
-        let playBtnHtml = document.getElementById('btnPlay').innerHTML || "";
-        if (playBtnHtml.includes('pause-fill')) {
-            connectCamilla();
-        }
-    }
-}
 
 function connectCamilla() {
     if (camillaWs && (camillaWs.readyState === WebSocket.OPEN || camillaWs.readyState === WebSocket.CONNECTING)) return;

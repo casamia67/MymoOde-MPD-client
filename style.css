@@ -146,22 +146,25 @@ main {
 /* --- METÀ SUPERIORE: BLOCCO UNICO CENTRATO --- */
 .player-top-half { 
     display: flex; height: 50%; width: 100%; 
-    align-items: center; justify-content: center; 
-    gap: 4vw; /* Spazio organico tra copertina e testo */
+    align-items: center; 
+    justify-content: center; /* Centra perfettamente l'intero blocco sullo schermo */
+    gap: 4vw; /* Spazio fisso tra copertina e testi */
     padding-bottom: 2vh; box-sizing: border-box;
 }
 
 .cover-section { 
-    flex: 0 1 auto; /* Prende solo lo spazio necessario */
-    display: flex; justify-content: center; align-items: center; 
+    flex: 0 0 auto; /* Dice al contenitore di NON alterare la sua larghezza */
+    display: flex; justify-content: center; 
+    align-items: center; 
     height: 100%; 
 }
 
-/* La copertina scala perfettamente in diagonale */
+/* La copertina scala mantenendo le proporzioni ma senza farsi schiacciare */
 .cover-frame-wrapper { 
     width: auto !important; height: 100% !important; 
     max-width: 100% !important; max-height: 100% !important; 
-    aspect-ratio: 1 / 1 !important; flex-shrink: 1 !important; 
+    aspect-ratio: 1 / 1 !important; 
+    flex-shrink: 0 !important; /* IMPORTANTE: Impedisce alla copertina di rimpicciolirsi */
     position: relative; transition: transform 0.3s ease; 
 }
 .cover-frame-wrapper:hover { transform: scale(0.95); }
@@ -178,11 +181,13 @@ main {
     font-weight: bold; border: 1px solid rgba(255,255,255,0.3); backdrop-filter: blur(5px); z-index: 10;
 }
 
+/* Scatola di testo con LARGHEZZA RIGIDA: risolve il problema dello schermo che balla */
 .info-and-controls { 
-    flex: 0 1 auto; /* Prende solo lo spazio che le serve */
+    width: clamp(300px, 40vw, 550px); /* Misura adattiva ma BLOCCATA per ogni schermo */
+    flex: 0 0 auto; /* Impedisce che il blocco cresca o si restringa in base al testo */
     display: flex; flex-direction: column; justify-content: center; 
-    align-items: flex-start; text-align: left; /* Testo a sx vicino alla copertina */
-    min-width: 0; overflow: hidden; max-width: 700px;
+    align-items: flex-start; text-align: left; 
+    overflow: hidden; /* Taglia automaticamente il testo in eccesso */
 }
 
 .track-info-group { margin-bottom: 2vh; width: 100%; }
@@ -267,14 +272,14 @@ body.layout-laptop .kdsi-stereo-container { transform: scale(0.75); }
 
 /* Tablet Verticale */
 body.layout-tablet .player-top-half { flex-direction: column; gap: 2vh; height: auto; padding-top: 2vh; }
-body.layout-tablet .cover-section { max-height: 350px; }
-body.layout-tablet .info-and-controls { align-items: center; text-align: center; margin-top: 2vh; }
-body.layout-tablet .controls-row, body.layout-tablet .primary-controls, body.layout-tablet .secondary-controls { justify-content: center; }
-body.layout-tablet .text-title { font-size: clamp(1.8rem, 4vh, 2.5rem); margin-bottom: 0.5vh; }
-body.layout-tablet .text-artist { font-size: clamp(1.1rem, 2.5vh, 1.5rem); margin-bottom: 0.5vh; }
-body.layout-tablet .text-album { font-size: clamp(0.9rem, 2vh, 1.2rem); margin-bottom: 0.5vh; }
-body.layout-tablet .icon-btn { font-size: 1.5rem; }
-body.layout-tablet .icon-btn.play-btn { font-size: 2.8rem; opacity: 1; }
+body.layout-tablet .cover-section { max-height: 350px; width: 100%; } /* Si assicura che usi tutto lo spazio orizzontale */
+body.layout-tablet .info-and-controls { 
+    width: 90%; /* Sblocca la larghezza fissa del desktop per riempire lo schermo in orizzontale */
+    max-width: 600px; /* Impedisce che il testo diventi una riga infinita sugli iPad grandi */
+    align-items: center; 
+    text-align: center; 
+    margin-top: 2vh; 
+}
 /* INGRANDIMENTO KDSI PER TABLET */
 body.layout-tablet .kdsi-stereo-container { transform: scale(0.55); }
 
@@ -327,7 +332,7 @@ body.layout-mobile #screensaverOverlay { display: none !important; }
 /* --- 7. PROGRESS BAR E VOLUME --- */
 .tech-info-container { font-family: "Courier New", Courier, monospace; color: #aaa; font-size: clamp(0.75rem, 1.5vmin, 1rem); line-height: 1.5; margin-top: 0.5rem; display: none; font-weight: bold; word-wrap: break-word; overflow-wrap: break-word; white-space: normal; max-width: 100%; }
 .tech-line i { margin-right: 5px; font-size: 1.1em; color: #ddd; }
-.progress-row { display: flex; align-items: center; gap: clamp(0.5rem, 2vw, 1rem); width: 100%; font-size: clamp(0.75rem, 1.8vmin, 0.9rem); color: #aaa; font-weight: 500; }
+.progress-row { display: flex; align-items: center; gap: clamp(0.5rem, 2vw, 1rem); width: 85%; font-size: clamp(0.75rem, 1.8vmin, 0.9rem); color: #aaa; font-weight: 500; }
 .progress-bar-bg { flex-grow: 1; height: 3px; background: rgba(255, 255, 255, 0.4); border-radius: 2px; cursor: pointer; position: relative; display: flex; align-items: center; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.8); }
 .progress-bar-fill { height: 100%; width: 0%; background: var(--hl-color); border-radius: 2px; pointer-events: none; box-shadow: 0 0 10px var(--hl-glow); position: relative; transition: width 1s linear; }
 .progress-bar-fill::after { content: ''; position: absolute; right: -5px; top: -3px; width: 10px; height: 10px; background: var(--hl-color); border-radius: 50%; box-shadow: 0 0 8px var(--hl-glow); }
