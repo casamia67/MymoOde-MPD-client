@@ -186,10 +186,103 @@
                     <canvas id="inlineVuLeft" class="vu-dual"></canvas>
                     <canvas id="inlineVuRight" class="vu-dual"></canvas>
                     <canvas id="inlineVuSingle" class="vu-single"></canvas>
+
+                    <!-- CONTENITORE PROTETTO KDSI ROUND A 3 COLONNE -->
+                    <div class="kdsi-scale-wrapper" id="inlineKdsiContainer" style="display: none;">
+                        <div class="kdsi-stereo-container">
+                            
+                            <!-- 1. CANALE SINISTRO -->
+                            <div class="kdsi-panel" id="kdsi-left">
+                                <div class="kdsi-screw-hole kdsi-hole-tl"><div class="kdsi-screw-head" style="transform: rotate(43deg);"><div class="kdsi-screw-slot"></div></div></div>
+                                <div class="kdsi-screw-hole kdsi-hole-tr"><div class="kdsi-screw-head" style="transform: rotate(-12deg);"><div class="kdsi-screw-slot"></div></div></div>
+                                <div class="kdsi-screw-hole kdsi-hole-bl"><div class="kdsi-screw-head" style="transform: rotate(78deg);"><div class="kdsi-screw-slot"></div></div></div>
+                                <div class="kdsi-screw-hole kdsi-hole-br"><div class="kdsi-screw-head" style="transform: rotate(-55deg);"><div class="kdsi-screw-slot"></div></div></div>
+                                <div class="kdsi-container">
+                                    <div class="kdsi-bezel">
+                                        <div class="kdsi-dial-back">
+                                            <canvas class="kdsi-dialCanvas" width="360" height="360"></canvas>
+                                            <svg class="kdsi-cover-svg" viewBox="0 0 360 360">
+                                                <defs>
+                                                    <linearGradient id="coverGradientL" x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="0%" stop-color="#383838"/><stop offset="20%" stop-color="#1f1f1f"/><stop offset="100%" stop-color="#050505"/>
+                                                    </linearGradient>
+                                                </defs>
+                                                <path d="M -20,400 L -20,210 Q 70,270 136,255 A 44,44 0 0,1 224,255 Q 290,270 380,210 L 380,400 Z" fill="url(#coverGradientL)" stroke="#555" stroke-width="1"/>
+                                            </svg>
+                                            <div class="kdsi-glass-glare"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 2. SEZIONE CENTRALE CON CONTROLLI IN ALTO E VALVOLE IN BASSO -->
+                            <div class="kdsi-center-console">
+                                <div class="kdsi-console-screw kdsi-c-tl"></div>
+                                <div class="kdsi-console-screw kdsi-c-tr"></div>
+                                <div class="kdsi-console-screw kdsi-c-bl"></div>
+                                <div class="kdsi-console-screw kdsi-c-br"></div>
+                                
+                                <div class="kdsi-console-inner">
+                                    <!-- Controlli di tono in alto -->
+                                    <div class="hw-group" style="justify-content: center; gap: 18px; margin-top: 5px;">
+                                        <div class="knob-container">
+                                            <div class="hw-knob" style="transform: rotate(-35deg);"><div class="hw-marker"></div></div>
+                                            <div class="hw-label">BASS</div>
+                                        </div>
+                                        <div class="knob-container">
+                                            <div class="hw-knob" style="transform: rotate(20deg);"><div class="hw-marker"></div></div>
+                                            <div class="hw-label">TREBLE</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Finestra in vetro con le valvole analogiche -->
+                                    <div class="valve-window">
+                                        <div class="valve-glass-glare"></div>
+                                        <div class="tubes-row">
+                                            <div class="vacuum-tube">
+                                                <div class="tube-top-cap"></div>
+                                                <div class="tube-plate"></div>
+                                                <div class="tube-filament"></div>
+                                            </div>
+                                            <div class="vacuum-tube">
+                                                <div class="tube-top-cap"></div>
+                                                <div class="tube-plate"></div>
+                                                <div class="tube-filament"></div>
+                                            </div>
+                                        </div>
+                                        <div class="valve-badge">VALVE STAGE</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 3. CANALE DESTRO -->
+                            <div class="kdsi-panel" id="kdsi-right">
+                                <div class="kdsi-screw-hole kdsi-hole-tl"><div class="kdsi-screw-head" style="transform: rotate(15deg);"><div class="kdsi-screw-slot"></div></div></div>
+                                <div class="kdsi-screw-hole kdsi-hole-tr"><div class="kdsi-screw-head" style="transform: rotate(88deg);"><div class="kdsi-screw-slot"></div></div></div>
+                                <div class="kdsi-screw-hole kdsi-hole-bl"><div class="kdsi-screw-head" style="transform: rotate(-33deg);"><div class="kdsi-screw-slot"></div></div></div>
+                                <div class="kdsi-screw-hole kdsi-hole-br"><div class="kdsi-screw-head" style="transform: rotate(22deg);"><div class="kdsi-screw-slot"></div></div></div>
+                                <div class="kdsi-container">
+                                    <div class="kdsi-bezel">
+                                        <div class="kdsi-dial-back">
+                                            <canvas class="kdsi-dialCanvas" width="360" height="360"></canvas>
+                                            <svg class="kdsi-cover-svg" viewBox="0 0 360 360">
+                                                <defs>
+                                                    <linearGradient id="coverGradientR" x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="0%" stop-color="#383838"/><stop offset="20%" stop-color="#1f1f1f"/><stop offset="100%" stop-color="#050505"/>
+                                                    </linearGradient>
+                                                </defs>
+                                                <path d="M -20,400 L -20,210 Q 70,270 136,255 A 44,44 0 0,1 224,255 Q 290,270 380,210 L 380,400 Z" fill="url(#coverGradientR)" stroke="#555" stroke-width="1"/>
+                                            </svg>
+                                            <div class="kdsi-glass-glare"></div>
+                                       </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-
         <div id="tab-queue" class="tab-pane">
             <div class="category-header">
                 <span class="path-display" data-i18n="title_queue_play">Coda di Riproduzione</span>
@@ -495,6 +588,7 @@
                         <option value="flat_mod00" data-i18n="vu_flat_mod00">Minimal Flat Mod. 00</option>
                         <option value="touch_mod15" data-i18n="vu_touch_mod15">Touch VU Mod. 15</option>
                         <option value="amber_mod75" data-i18n="vu_amber_mod75">Amber Classic Mod. 75</option>
+                        <option value="kdsi_round">KDSI 80-52 Round (Studio)</option>
                     </select>
                     
                     <label data-i18n="lbl_device_layout">Adattamento Schermo</label>

@@ -1504,3 +1504,4 @@ function drawNeedle(ctx, value, style) {
         }
     } catch (e) { }
 }
+

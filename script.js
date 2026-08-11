@@ -444,14 +444,19 @@ async function loadSettings() {
         console.warn("Server non raggiungibile, uso la cache locale");
     } 
     
-    // Riapplica i valori caricati all'interfaccia (come già facevi)
+    // Riapplica i valori caricati all'interfaccia
     if(document.getElementById('ssTimeout')) document.getElementById('ssTimeout').value = localStorage.getItem('camilla_ss_timeout') || '1'; 
     if(document.getElementById('ssRandomTime')) document.getElementById('ssRandomTime').value = localStorage.getItem('camilla_ss_random') || '0.5'; 
     if(document.getElementById('vuStyleSelect')) document.getElementById('vuStyleSelect').value = localStorage.getItem('camilla_vu_style') || 'blue_mod70'; 
     if(document.getElementById('wsUriInput')) document.getElementById('wsUriInput').value = localStorage.getItem('camilla_ws_uri') || ("ws://" + hostname + ":1234"); 
     if(document.getElementById('moodeUiUrlInput')) document.getElementById('moodeUiUrlInput').value = localStorage.getItem('moode_ui_url') || ("http://" + hostname); 
     if(document.getElementById('streamUrlInput')) document.getElementById('streamUrlInput').value = localStorage.getItem('camilla_stream_url') || (`http://${hostname}:8000/mpd.ogg`); 
+    
     if(document.getElementById('backlightToggle')) document.getElementById('backlightToggle').checked = localStorage.getItem('camilla_backlight') !== 'false'; 
+    
+    // ---> GESTIONE CLASSE BODY PER RETROILLUMINAZIONE <---
+    document.body.classList.toggle('backlight-off', localStorage.getItem('camilla_backlight') === 'false');
+    
     if(document.getElementById('inlineVuToggle')) document.getElementById('inlineVuToggle').checked = localStorage.getItem('camilla_inline_vu') !== 'false'; 
     if(document.getElementById('localAnalyzerToggle')) document.getElementById('localAnalyzerToggle').checked = localStorage.getItem('camilla_local_analyzer') !== 'false'; 
     if(document.getElementById('deviceLayout')) document.getElementById('deviceLayout').value = localStorage.getItem('camilla_device_layout') || 'auto'; 
@@ -476,6 +481,7 @@ async function loadSettings() {
         
     initAutoSave();
 }
+
 
 // Nuove funzioni per i bottoni
 async function saveClientSettings() {
@@ -551,6 +557,10 @@ function saveSettings() {
     let moodeUrl = document.getElementById('moodeUiUrlInput') ? document.getElementById('moodeUiUrlInput').value : '';
     let streamUrl = document.getElementById('streamUrlInput') ? document.getElementById('streamUrlInput').value : '';
     let backlight = document.getElementById('backlightToggle') ? document.getElementById('backlightToggle').checked : true;
+    
+    // ---> GESTIONE CLASSE BODY PER RETROILLUMINAZIONE <---
+    document.body.classList.toggle('backlight-off', !backlight);
+    
     let inlineVu = document.getElementById('inlineVuToggle') ? document.getElementById('inlineVuToggle').checked : true;
     let localAnalyzer = document.getElementById('localAnalyzerToggle') ? document.getElementById('localAnalyzerToggle').checked : true;
     let deviceLayout = document.getElementById('deviceLayout') ? document.getElementById('deviceLayout').value : 'auto';
@@ -2182,3 +2192,119 @@ setInterval(() => {
         }
     } catch(e) {}
 }, 1500);
+
+// =========================================
+// MOTORE INDIPENDENTE: KDSI ROUND (PLAYER INLINE)
+// =========================================
+function initKdsiEngine() {
+    const canvasL = document.querySelector('#kdsi-left .kdsi-dialCanvas');
+    const ctxL = canvasL ? canvasL.getContext('2d') : null;
+    const canvasR = document.querySelector('#kdsi-right .kdsi-dialCanvas');
+    const ctxR = canvasR ? canvasR.getContext('2d') : null;
+
+    if (!ctxL || !ctxR) return;
+
+    function drawRotatedText(ctx, text, r, angle, font, fillStyle) {
+        ctx.save();
+        const cx = 180, cy = 255;
+        ctx.translate(cx + Math.cos(angle) * r, cy + Math.sin(angle) * r);
+        ctx.rotate(angle + Math.PI / 2);
+        ctx.font = font;
+        ctx.fillStyle = fillStyle;
+        ctx.fillText(text, 0, 0);
+        ctx.restore();
+    }
+
+    function renderKDSI(ctx, value, label) {
+        const cx = 180, cy = 255; 
+        const rTop = 152, rBot = 146;
+        const sAng = -Math.PI * 0.73, eAng = -Math.PI * 0.27;
+
+        ctx.clearRect(0, 0, 360, 360);
+        ctx.textBaseline = "middle"; ctx.textAlign = "center"; ctx.lineCap = "round";
+
+        // Archi base
+        ctx.strokeStyle = "rgba(10, 0, 0, 0.95)";
+        ctx.lineWidth = 2.5; ctx.beginPath(); ctx.arc(cx, cy, rTop, sAng, eAng); ctx.stroke();
+        ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(cx, cy, rBot, sAng, eAng); ctx.stroke();
+
+        const ticks = 40;
+        const mTop = ["200","150","100","50","0","50","100","150","200"];
+        const mBot = ["2","1.5","1",".5"," ",".5","1","1.5","2"];
+
+        for (let i = 0; i <= ticks; i++) {
+            let a = sAng + (i / ticks) * (eAng - sAng);
+            let cos = Math.cos(a), sin = Math.sin(a);
+
+            if (i % 5 === 0) {
+                ctx.lineWidth = 2.2; ctx.beginPath(); ctx.moveTo(cx + cos * rTop, cy + sin * rTop); ctx.lineTo(cx + cos * (rTop + 12), cy + sin * (rTop + 12)); ctx.stroke();
+                drawRotatedText(ctx, mTop[i/5], rTop + 24, a, "bold 13px 'Helvetica Neue', Arial", "rgba(15,0,0,0.95)");
+                
+                ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(cx + cos * rBot, cy + sin * rBot); ctx.lineTo(cx + cos * (rBot - 8), cy + sin * (rBot - 8)); ctx.stroke();
+                drawRotatedText(ctx, mBot[i/5], rBot - 18, a, "bold 11px 'Helvetica Neue', Arial", "rgba(15,0,0,0.95)");
+            } else {
+                ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(cx + cos * rTop, cy + sin * rTop); ctx.lineTo(cx + cos * (rTop + 6), cy + sin * (rTop + 6)); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(cx + cos * rBot, cy + sin * rBot); ctx.lineTo(cx + cos * (rBot - 4), cy + sin * (rBot - 4)); ctx.stroke();
+            }
+        }
+        drawRotatedText(ctx, "-", rTop + 22, sAng - 0.08, "bold 19px Arial", "rgba(10,0,0,0.95)");
+        drawRotatedText(ctx, "+", rTop + 22, eAng + 0.08, "bold 17px Arial", "rgba(10,0,0,0.95)");
+
+        // Loghi 
+        ctx.fillStyle = "rgba(15, 0, 0, 0.95)";
+        ctx.font = "bold 16px 'Helvetica Neue', Arial"; ctx.fillText("mV.V", cx, cy - 90);
+        ctx.font = "bold 12px Arial"; ctx.fillText("KDSI", cx - 75, cy - 60);
+        ctx.font = "10px Arial"; ctx.fillText("80-52", cx - 75, cy - 45);
+        ctx.fillText("2.5  CE", cx + 75, cy - 60); ctx.fillText("F.S:DC±200mV", cx + 75, cy - 45);
+        ctx.font = "bold 14px Arial"; ctx.fillStyle = "rgba(10,0,0,0.5)"; ctx.fillText(label, cx, cy - 120); 
+
+        // Ago
+        const tAng = sAng + (value / 255) * (eAng - sAng);
+        const nCos = Math.cos(tAng), nSin = Math.sin(tAng);
+        const needleL = rTop + 13;
+
+        ctx.strokeStyle = "rgba(0, 0, 0, 0.35)"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(cx + 2, cy + 2); ctx.lineTo((cx + 2) + nCos * needleL, (cy + 2) + nSin * needleL); ctx.stroke();
+        ctx.strokeStyle = "#050505"; ctx.lineWidth = 1.8; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + nCos * needleL, cy + nSin * needleL); ctx.stroke();
+    }
+
+    function renderPlayerKDSI() {
+        let styleSelect = document.getElementById('vuStyleSelect');
+        let isKdsi = styleSelect && styleSelect.value === 'kdsi_round';
+        let isInlineActive = document.getElementById('inlineVuContainer') && document.getElementById('inlineVuContainer').style.display !== 'none';
+        
+        let kdsiCont = document.getElementById('inlineKdsiContainer');
+        let cvsL = document.getElementById('inlineVuLeft'), cvsR = document.getElementById('inlineVuRight'), cvsS = document.getElementById('inlineVuSingle');
+
+        if (kdsiCont && isInlineActive) {
+            if (isKdsi) {
+                let mode = (typeof currentLayoutMode !== 'undefined') ? currentLayoutMode : 'desktop';
+                if (mode !== 'mobile') {
+                    kdsiCont.style.display = 'flex'; // Ora mostra il Wrapper con altezza fissa
+                    if(cvsL) cvsL.style.display = 'none'; 
+                    if(cvsR) cvsR.style.display = 'none'; 
+                    if(cvsS) cvsS.style.display = 'none';
+                    
+                    let valL = (typeof smoothedL !== 'undefined') ? smoothedL : 0;
+                    let valR = (typeof smoothedR !== 'undefined') ? smoothedR : 0;
+                    renderKDSI(ctxL, valL, "LEFT"); renderKDSI(ctxR, valR, "RIGHT");
+                }
+            } else {
+                kdsiCont.style.display = 'none';
+                let mode = (typeof currentLayoutMode !== 'undefined') ? currentLayoutMode : 'desktop';
+                if (mode === 'mobile') { 
+                    if(cvsS) cvsS.style.display = ''; 
+                    if(cvsL) cvsL.style.display = 'none'; 
+                    if(cvsR) cvsR.style.display = 'none';
+                } else { 
+                    if(cvsL) cvsL.style.display = ''; 
+                    if(cvsR) cvsR.style.display = ''; 
+                    if(cvsS) cvsS.style.display = 'none';
+                }
+            }
+        }
+        requestAnimationFrame(renderPlayerKDSI);
+    }
+    renderPlayerKDSI();
+}
+
+if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', initKdsiEngine); } else { initKdsiEngine(); }
