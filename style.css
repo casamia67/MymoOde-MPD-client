@@ -212,8 +212,8 @@ main {
 .inline-vu-container { 
     display: flex; height: 50%; width: 100%; 
     justify-content: center; align-items: center; gap: 2vw; 
-    border-top: 1px solid rgba(255,255,255,0.05); padding-top: 2vh; 
- 
+    border-top: none; /* <-- LA LINEA DIVISORIA È STATA RIMOSSA QUI */ 
+    padding-top: 2vh; 
 }
 
 .inline-vu-container canvas.vu-dual { 
@@ -563,7 +563,7 @@ div.kdsi-dial-back canvas.kdsi-dialCanvas { position: absolute !important; top: 
 .valve-glass-glare { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.02) 50%, rgba(0,0,0,0) 100%); pointer-events: none; z-index: 10; }
 .tubes-row { display: flex; gap: 25px; align-items: center; justify-content: center; z-index: 2; }
 .vacuum-tube { width: 42px; height: 130px; background: linear-gradient(90deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0.03) 100%); border: 1.5px solid rgba(255, 255, 255, 0.15); border-radius: 20px 20px 6px 6px; position: relative; display: flex; flex-direction: column; align-items: center; box-shadow: inset 0 0 12px rgba(255, 140, 0, 0.4), 0 0 15px rgba(255, 100, 0, 0.3); animation: glassGlow 3.5s ease-in-out infinite alternate; }
-.tube-top-cap { width: 22px; height: 8px; background: linear-gradient(90deg, #444, #888, #333); border-radius: 4px; margin-top: 3px; border: 1px solid #111; }
+.tube-top-cap { width: 22px; height: 8px; margin-top: 3px; border-radius: 4px; background: linear-gradient(90deg, #444444 0%, #ffffff 15%, #888888 30%, #111111 50%, #666666 65%, #ffffff 85%, #222222 100%); border: 1px solid #111; box-shadow: inset 0 1px 2px rgba(255,255,255,0.9), 0 2px 4px rgba(0,0,0,0.8); }
 .tube-plate { width: 26px; height: 70px; background: repeating-linear-gradient(0deg, #1a1a1a, #1a1a1a 2px, #2a2a2a 2px, #2a2a2a 4px); border: 1px solid #000; margin-top: 10px; border-radius: 3px; box-shadow: inset 0 0 6px rgba(0,0,0,0.9); }
 .tube-filament { position: absolute; bottom: 40px; width: 3px; height: 55px; background: #ffb700; border-radius: 2px; box-shadow: 0 0 12px #ff6600, 0 0 25px #ff3300, inset 0 0 4px #ffffff; animation: tubeGlow 3.5s ease-in-out infinite alternate; }
 .tube-filament::before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 25px; height: 40px; background: radial-gradient(circle, rgba(255, 120, 0, 0.8) 0%, rgba(255, 60, 0, 0.3) 50%, transparent 80%); border-radius: 50%; filter: blur(4px); z-index: -1; animation: plateLight 3.5s ease-in-out infinite alternate; }
@@ -604,4 +604,112 @@ body.backlight-off .kdsi-cover-svg {
     /* Abbassa la luminosità dei testi e delle tacche interne */
     opacity: 0.6; 
     filter: drop-shadow(0px -2px 3px rgba(0,0,0,0.9));
+}
+
+
+/* --- VITE CENTRALE VU METER KDSI (INGRANDITA E INCASSATA) --- */
+.kdsi-needle-screw {
+    position: absolute;
+    bottom: 88px; /* Leggermente abbassata per compensare il nuovo raggio */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 28px; /* Aumentato da 18px a 28px */
+    height: 28px; 
+    background: radial-gradient(circle at 30% 30%, #555 0%, #222 50%, #050505 100%);
+    border-radius: 50%;
+    border: 2px solid #000; /* Bordo netto scuro */
+    
+    /* MAGIA DEL 3D:
+       1. inset 3px 5px 8px = Ombra profonda dentro il buco in alto a sinistra
+       2. inset -1px -1px 2px = Piccolo riflesso interno sul metallo
+       3. 0 1px 1px = Luce che colpisce il bordo inferiore esterno del pannello tagliato */
+    box-shadow: 
+        inset 4px 6px 10px rgba(0,0,0,0.95), 
+        inset -1px -1px 3px rgba(255,255,255,0.1),
+        0 1px 1px rgba(255,255,255,0.2); 
+    
+    z-index: 10; 
+    pointer-events: none;
+}
+
+/* Fessura per il cacciavite proporzionata */
+.kdsi-needle-screw::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 10%; /* Allargata per coprire quasi tutta la testa della vite */
+    width: 80%;
+    height: 3px; /* Taglio più profondo e spesso */
+    background: #000;
+    transform: translateY(-50%) rotate(35deg); 
+    box-shadow: 0 1px 0 rgba(255,255,255,0.15); /* Riflesso speculare della luce */
+}
+
+/* --- MOTORE ILLUMINAZIONE VU METER (TONALITÀ CALDE) --- */
+
+/* 1. Tube Glow (Ambra profondo) */
+body.theme-amber .kdsi-dial-back {
+    background: radial-gradient(circle at 50% 85%, #ffeba8 0%, #ffae19 35%, #de4a00 65%, #300a00 100%);
+}
+
+/* 2. Pearl (Bianco puro da studio, moderno e luminoso con ombre fredde) */
+body.theme-pearl .kdsi-dial-back {
+    background: radial-gradient(circle at 50% 85%, #ffffff 0%, #f0f4f8 40%, #ced4da 75%, #5c636a 100%);
+}
+
+/* 3. Classic (Vera pergamena invecchiata, tendente al giallo/senape vintage) */
+body.theme-classic .kdsi-dial-back {
+    background: radial-gradient(circle at 50% 85%, #fffbe6 0%, #e8dcb8 35%, #b59b6d 70%, #4a3b22 100%);
+}}
+
+/* 4. Console (Oro/Tungsteno stile sintoamplificatori vintage) */
+body.theme-console .kdsi-dial-back {
+    background: radial-gradient(circle at 50% 85%, #fffae6 0%, #ffcc66 35%, #b36b00 70%, #331a00 100%);
+}
+
+/* --- RECUPERO STILI HARDWARE PER I NUOVI TEMI KDSI CALDI --- */
+
+/* 1. Manopole in alluminio */
+body.theme-amber .hw-knob, 
+body.theme-pearl .hw-knob, 
+body.theme-classic .hw-knob, 
+body.theme-console .hw-knob { 
+    background: radial-gradient(circle at 50% 0%, #e0e0e0, #888 60%, #444); 
+    border: 2px solid #222; 
+}
+
+/* 2. Tacca nera sulle manopole */
+body.theme-amber .hw-marker, 
+body.theme-pearl .hw-marker, 
+body.theme-classic .hw-marker, 
+body.theme-console .hw-marker { 
+    background: #111; 
+}
+
+/* 3. Piedini del Rack per il salvaschermo */
+body.theme-amber .foot, 
+body.theme-pearl .foot, 
+body.theme-classic .foot, 
+body.theme-console .foot { 
+    background: linear-gradient(90deg, #444, #aaa, #444); 
+    border-bottom: 8px solid #111; 
+}
+
+/* 4. LED caldi (Ambra) */
+body.theme-amber .hw-led, 
+body.theme-pearl .hw-led, 
+body.theme-classic .hw-led, 
+body.theme-console .hw-led { 
+    background: #ff9800; 
+    box-shadow: 0 0 10px #ff9800, inset 0 0 3px #fff; 
+}
+
+/* --- SPEGNIMENTO REALE RETROILLUMINAZIONE KDSI --- */
+body.backlight-off .kdsi-dial-back {
+    filter: brightness(0.2) sepia(0.3) !important;
+}
+
+body.backlight-off .hw-led {
+    background: #2a1100 !important;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.9) !important;
 }

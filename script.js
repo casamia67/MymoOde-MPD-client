@@ -388,6 +388,14 @@ function updateUITheme(style) {
         else { logoText = "VINTAGE '60"; fontClass="vintage"; }
     }
     else if (style === 'touch_mod15') { themeClass = 'theme-default'; logoText = "TOUCH METER '15"; fontClass="picore"; }
+    
+    // --- NUOVI TEMI KDSI CALDI AGGIUNTI QUI ---
+    else if (style === 'amber') { themeClass = 'theme-amber'; logoText = "TUBE GLOW"; fontClass = "peppy"; }
+    else if (style === 'pearl') { themeClass = 'theme-pearl'; logoText = "STUDIO PEARL"; fontClass = "peppy"; }
+    else if (style === 'classic') { themeClass = 'theme-classic'; logoText = "CLASSIC '70"; fontClass = "peppy"; }
+    else if (style === 'console') { themeClass = 'theme-console'; logoText = "CONSOLE EQ"; fontClass = "peppy"; }
+    else if (style === 'kdsi_round') { themeClass = 'theme-default'; logoText = "KDSI ROUND"; fontClass = "peppy"; }
+    
     else if (style && style.includes('meter')) { themeClass = 'theme-default'; logoText = "VU METER"; fontClass="peppy"; }
 
     // --- INIZIO LETTURA NOMI PERSONALIZZATI (SOVRASCRIVE IL DEFAULT) ---
@@ -1981,9 +1989,13 @@ document.addEventListener('DOMContentLoaded', () => {
         let menu = document.createElement('div');
         menu.id = 'customContextMenu';
         menu.style.cssText = 'display:none; position:fixed; z-index:99999; background:#222; border:1px solid rgba(255,255,255,0.15); border-radius:8px; box-shadow:0 4px 15px rgba(0,0,0,0.5); padding:6px 0; min-width:160px;';
+        
         menu.innerHTML = `
             <div id="ctxChangeCover" style="padding:10px 16px; color:#fff; font-size:0.9rem; cursor:pointer; display:flex; align-items:center; gap:10px;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">
-                <i class="bi bi-image"></i> Cambia copertina
+                <i class="bi bi-image"></i> <span data-i18n="ctx_change_cover">Carica immagine locale</span>
+            </div>
+            <div id="ctxSearchWeb" style="padding:10px 16px; color:#fff; font-size:0.9rem; cursor:pointer; display:flex; align-items:center; gap:10px;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">
+                <i class="bi bi-globe"></i> <span data-i18n="ctx_search_web">Cerca copertina sul Web</span>
             </div>
         `;
         document.body.appendChild(menu);
@@ -2009,6 +2021,10 @@ function showContextMenu(e, actionPath) {
     document.getElementById('ctxChangeCover').onclick = () => {
         menu.style.display = 'none';
         changeCover(activeContextMenuPath);
+    };
+    document.getElementById('ctxSearchWeb').onclick = () => {
+        menu.style.display = 'none';
+        openWebCoverSearch(activeContextMenuPath);
     };
 }
 
@@ -2124,6 +2140,9 @@ setInterval(() => {
 // =========================================
 // MOTORE INDIPENDENTE: KDSI ROUND (PLAYER INLINE)
 // =========================================
+// =========================================
+// MOTORE INDIPENDENTE: KDSI ROUND (PLAYER INLINE)
+// =========================================
 function initKdsiEngine() {
     const canvasL = document.querySelector('#kdsi-left .kdsi-dialCanvas');
     const ctxL = canvasL ? canvasL.getContext('2d') : null;
@@ -2143,7 +2162,7 @@ function initKdsiEngine() {
         ctx.restore();
     }
 
-        function renderKDSI(ctx, value, label) {
+    function renderKDSI(ctx, value, label) {
         const cx = 180, cy = 255; 
         const rTop = 152, rBot = 146;
         const sAng = -Math.PI * 0.73, eAng = -Math.PI * 0.27;
@@ -2186,19 +2205,49 @@ function initKdsiEngine() {
         ctx.fillText("2.5  CE", cx + 75, cy - 60); ctx.fillText("F.S:DC±200mV", cx + 75, cy - 45);
         ctx.font = "bold 14px Arial"; ctx.fillStyle = "rgba(10,0,0,0.5)"; ctx.fillText(label, cx, cy - 120); 
 
-        // Ago
+        // Calcolo posizione Ago
         const tAng = sAng + (value / 255) * (eAng - sAng);
         const nCos = Math.cos(tAng), nSin = Math.sin(tAng);
+        
+        // --- COLORE DELL'AGO DINAMICO (Toni Caldi) ---
+        let needleColor = "#050505"; // Nero classico di default (per Ambra)
+        
+        if (document.body.classList.contains('theme-pearl')) {
+            needleColor = "#2b1a10"; // Marrone scuro per staccare sul perlato
+        } else if (document.body.classList.contains('theme-classic')) {
+            needleColor = "#7a0000"; // Rosso scuro vintage per il Classic
+        } else if (document.body.classList.contains('theme-console')) {
+            needleColor = "#1a0f05"; // Nero caldo per la Console
+        }
+
+        // Disegno dell'ago e ombra
         const needleL = rTop + 13;
-
-        ctx.strokeStyle = "rgba(0, 0, 0, 0.35)"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(cx + 2, cy + 2); ctx.lineTo((cx + 2) + nCos * needleL, (cy + 2) + nSin * needleL); ctx.stroke();
-        ctx.strokeStyle = "#050505"; ctx.lineWidth = 1.8; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + nCos * needleL, cy + nSin * needleL); ctx.stroke();
+        
+        // Ombra
+        ctx.strokeStyle = "rgba(0, 0, 0, 0.35)"; 
+        ctx.lineWidth = 2; 
+        ctx.beginPath(); 
+        ctx.moveTo(cx + 2, cy + 2); 
+        ctx.lineTo((cx + 2) + nCos * needleL, (cy + 2) + nSin * needleL); 
+        ctx.stroke();
+        
+        // Ago vero e proprio
+        ctx.strokeStyle = needleColor; 
+        ctx.lineWidth = 1.8; 
+        ctx.beginPath(); 
+        ctx.moveTo(cx, cy); 
+        ctx.lineTo(cx + nCos * needleL, cy + nSin * needleL); 
+        ctx.stroke();
     }
-
 
     function renderPlayerKDSI() {
         let styleSelect = document.getElementById('vuStyleSelect');
-        let isKdsi = styleSelect && styleSelect.value === 'kdsi_round';
+        
+        // --- MODIFICA CHIAVE ---
+        // Ora riconosce sia il nome originale che i nuovi colori come attivatori del modulo
+        let kdsiThemes = ['kdsi_round', 'amber', 'pearl', 'classic', 'console'];
+        let isKdsi = styleSelect && kdsiThemes.includes(styleSelect.value);
+        
         let isInlineActive = document.getElementById('inlineVuContainer') && document.getElementById('inlineVuContainer').style.display !== 'none';
         
         let kdsiCont = document.getElementById('inlineKdsiContainer');
@@ -2236,4 +2285,82 @@ function initKdsiEngine() {
     renderPlayerKDSI();
 }
 
+if (document.readyState === 'loading') { 
+    document.addEventListener('DOMContentLoaded', initKdsiEngine); 
+} else { 
+    initKdsiEngine(); 
+}
+
 if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', initKdsiEngine); } else { initKdsiEngine(); }
+
+
+// --- MOTORE SCRAPER COPERTINE (API iTUNES) ---
+function openWebCoverSearch(path) {
+    // 1. Pulisce il percorso per estrarre una stringa di ricerca sensata
+    // Es. "NAS/Rock/Pink Floyd - The Wall" diventerà "Pink Floyd - The Wall"
+    let cleanString = path.split('/').pop();
+    // Rimuove eventuali tag come [FLAC] o (2023 Remaster) per aiutare la ricerca
+    cleanString = cleanString.replace(/\[.*?\]|\(.*?\)/g, '').trim(); 
+    
+    document.getElementById('webCoverInput').value = cleanString;
+    document.getElementById('webCoverResults').innerHTML = '';
+    document.getElementById('webCoverModal').style.display = 'flex';
+    searchWebCover(); // Avvia subito la ricerca automatica
+}
+
+function searchWebCover() {
+    let query = document.getElementById('webCoverInput').value;
+    if(!query) return;
+    
+    let resultsDiv = document.getElementById('webCoverResults');
+    resultsDiv.innerHTML = '<div style="color:var(--hl-color); grid-column:1/-1; text-align:center;"><i class="bi bi-hourglass-split"></i> Ricerca nel database globale...</div>';
+
+    // Interroga iTunes API (velocissima e senza chiavi)
+    fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=album&limit=15`)
+    .then(res => res.json())
+    .then(data => {
+        if(data.results.length === 0) {
+            resultsDiv.innerHTML = '<div style="color:#dc3545; grid-column:1/-1; text-align:center;">Nessun risultato trovato. Prova a semplificare il testo della ricerca (es. inserisci solo Artista e Titolo Album).</div>';
+            return;
+        }
+        
+        let html = '';
+        data.results.forEach(album => {
+            // L'API restituisce immagini 100x100. Sostituendo la stringa otteniamo i master 600x600 o 1000x1000
+            let highResUrl = album.artworkUrl100.replace('100x100bb', '600x600bb');
+            
+            html += `
+            <div style="cursor:pointer; background:#111; border-radius:8px; border:1px solid #333; overflow:hidden; transition:0.2s;" onmouseover="this.style.borderColor='var(--hl-color)'" onmouseout="this.style.borderColor='#333'" onclick="downloadWebCover('${highResUrl}')">
+                <img src="${highResUrl}" style="width:100%; aspect-ratio:1; object-fit:cover; display:block;">
+                <div style="padding:10px; text-align:center;">
+                    <div style="font-size:0.85rem; font-weight:bold; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${album.collectionName}">${album.collectionName}</div>
+                    <div style="font-size:0.75rem; color:#aaa; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${album.artistName}</div>
+                </div>
+            </div>`;
+        });
+        resultsDiv.innerHTML = html;
+    }).catch(e => {
+        resultsDiv.innerHTML = '<div style="color:#dc3545; grid-column:1/-1; text-align:center;">Errore di rete durante la connessione al database.</div>';
+    });
+}
+
+function downloadWebCover(imageUrl) {
+    let resultsDiv = document.getElementById('webCoverResults');
+    resultsDiv.innerHTML = '<div style="color:var(--hl-color); grid-column:1/-1; text-align:center; font-size:1.2rem;"><i class="bi bi-cloud-arrow-down-fill"></i> Download e iniezione nel server in corso...</div>';
+    
+    // Passa la palla al backend PHP
+    fetch(`${API}?action=download_web_cover&folder=${encodeURIComponent(activeContextMenuPath)}&url=${encodeURIComponent(imageUrl)}`)
+    .then(res => res.json())
+    .then(data => {
+        if(data.success) {
+            document.getElementById('webCoverModal').style.display = 'none';
+            // Clicca automaticamente il bottone di Sincronizzazione per ricaricare l'interfaccia
+            if(typeof clearRackCache === 'function') clearRackCache();
+        } else {
+            alert("Errore durante il salvataggio: " + data.error);
+            searchWebCover(); // Ricarica i risultati per permettere un altro tentativo
+        }
+    }).catch(e => {
+        alert("Errore di comunicazione con il server locale.");
+    });
+}

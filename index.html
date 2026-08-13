@@ -210,6 +210,7 @@
                                                 <path d="M -20,400 L -20,210 Q 70,270 136,255 A 44,44 0 0,1 224,255 Q 290,270 380,210 L 380,400 Z" fill="url(#coverGradientL)" stroke="#555" stroke-width="1"/>
                                             </svg>
                                             <div class="kdsi-glass-glare"></div>
+                                            <div class="kdsi-needle-screw"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -274,6 +275,7 @@
                                                 <path d="M -20,400 L -20,210 Q 70,270 136,255 A 44,44 0 0,1 224,255 Q 290,270 380,210 L 380,400 Z" fill="url(#coverGradientR)" stroke="#555" stroke-width="1"/>
                                             </svg>
                                             <div class="kdsi-glass-glare"></div>
+                                            <div class="kdsi-needle-screw"></div>
                                        </div>
                                     </div>
                                 </div>
@@ -588,7 +590,10 @@
                         <option value="flat_mod00" data-i18n="vu_flat_mod00">Minimal Flat Mod. 00</option>
                         <option value="touch_mod15" data-i18n="vu_touch_mod15">Touch VU Mod. 15</option>
                         <option value="amber_mod75" data-i18n="vu_amber_mod75">Amber Classic Mod. 75</option>
-                        <option value="kdsi_round">KDSI 80-52 Round (Studio)</option>
+                        <option value="amber">KDSI 80-52 Round (Tube Glow)</option>
+                        <option value="pearl">KDSI 80-52 Round (Pearl)</option>
+                        <option value="classic">KDSI 80-52 Round (Classic)</option>
+                        <option value="console">KDSI 80-52 Round (Console)</option>
                     </select>
                     
                     <label data-i18n="lbl_device_layout">Adattamento Schermo</label>
@@ -657,6 +662,24 @@
             </div>
         </div>
     </main>
+
+    <!-- POPUP MODALE PER WEB SCRAPER COPERTINE -->
+    <div id="webCoverModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.9); z-index:100000; align-items:center; justify-content:center; flex-direction:column; padding:20px; backdrop-filter: blur(10px);">
+        <div style="background:#1a1a1a; padding:25px; border-radius:12px; width:100%; max-width:900px; border:1px solid #333; box-shadow: 0 20px 50px rgba(0,0,0,1);">
+            <h3 style="margin-top:0; color:var(--hl-color); display:flex; align-items:center; gap:10px;"><i class="bi bi-globe"></i> <span data-i18n="lbl_scraper_title">Scraper Copertine</span></h3>
+            <p style="color:#aaa; font-size:0.9rem; margin-bottom:15px;" data-i18n="desc_scraper">Modifica il testo se la ricerca automatica non trova l'album corretto.</p>
+            
+            <div style="display:flex; gap:10px; margin-bottom:20px;">
+                <input type="text" id="webCoverInput" data-i18n-placeholder="ph_scraper" style="flex:1; padding:12px; border-radius:6px; background:#000; border:1px solid #444; color:#fff; font-size:1.1rem;" placeholder="Es. Pink Floyd Dark Side">
+                <button class="btn-addplay" onclick="searchWebCover()" style="margin:0; width:auto; padding:0 25px;"><i class="bi bi-search"></i> <span data-i18n="btn_search">CERCA</span></button>
+                <button class="btn-addplay" onclick="document.getElementById('webCoverModal').style.display='none'" style="margin:0; width:auto; padding:0 20px; background:rgba(255,255,255,0.1); border-color:#555;" data-i18n="btn_cancel">Annulla</button>
+            </div>
+            
+            <!-- Griglia dei risultati -->
+            <div id="webCoverResults" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(160px, 1fr)); gap:20px; max-height:60vh; overflow-y:auto; padding-right:10px;">
+            </div>
+        </div>
+    </div>
 
     <div id="miniPlayer" onclick="switchTab('nowplaying')">
         <div class="mp-progress-bg"><div class="mp-progress-fill" id="mpProgress"></div></div>

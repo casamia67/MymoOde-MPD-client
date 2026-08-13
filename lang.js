@@ -108,7 +108,18 @@ const translations = {
         "msg_config_saved": "Configurazione Salvata!",
         "confirm_restore_defaults": "Vuoi eliminare la configurazione permanente di questo dispositivo e ripristinare i valori globali?",
         "msg_save_error": "Errore durante il salvataggio.",
-        "msg_restore_error": "Errore durante il ripristino."
+        "msg_restore_error": "Errore durante il ripristino.",
+
+        "ctx_change_cover": "Carica immagine locale",
+        "ctx_search_web": "Cerca copertina sul Web",
+        "lbl_scraper_title": "Scraper Copertine",
+        "desc_scraper": "Modifica il testo se la ricerca automatica non trova l'album corretto.",
+        "ph_scraper": "Es. Pink Floyd Dark Side",
+        "btn_cancel": "Annulla",
+        "msg_scraper_search": "Ricerca nel database globale in corso...",
+        "msg_scraper_no_res": "Nessun risultato trovato. Prova a semplificare il testo (es. solo Artista e Album).",
+        "msg_scraper_err": "Errore di rete durante la connessione al database.",
+        "msg_scraper_down": "Download e salvataggio nel server in corso..."
     },
     en: {
         "tab_player": "Player", "tab_queue": "Queue", "tab_favs": "Favorites",
@@ -219,7 +230,18 @@ const translations = {
         "msg_config_saved": "Configuration Saved!",
         "confirm_restore_defaults": "Do you want to delete this device's permanent configuration and restore global defaults?",
         "msg_save_error": "Error during save.",
-        "msg_restore_error": "Error during restore."
+        "msg_restore_error": "Error during restore.",
+
+        "ctx_change_cover": "Load local image",
+        "ctx_search_web": "Search cover on the Web",
+        "lbl_scraper_title": "Cover Scraper",
+        "desc_scraper": "Modify the text if the automatic search doesn't find the correct album.",
+        "ph_scraper": "e.g. Pink Floyd Dark Side",
+        "btn_cancel": "Cancel",
+        "msg_scraper_search": "Searching the global database...",
+        "msg_scraper_no_res": "No results found. Try simplifying the text (e.g. just Artist and Album).",
+        "msg_scraper_err": "Network error while connecting to the database.",
+        "msg_scraper_down": "Downloading and saving to server..."
     },
     es: {
         "tab_player": "Reproductor", "tab_queue": "Cola", "tab_favs": "Favoritos",
@@ -330,7 +352,18 @@ const translations = {
         "msg_config_saved": "¡Configuración Guardada!",
         "confirm_restore_defaults": "¿Deseas eliminar la configuración permanente de este dispositivo y restaurar los valores globales?",
         "msg_save_error": "Error al guardar.",
-        "msg_restore_error": "Error al restaurar."
+        "msg_restore_error": "Error al restaurar.",
+
+        "ctx_change_cover": "Cargar imagen local",
+        "ctx_search_web": "Buscar carátula en la Web",
+        "lbl_scraper_title": "Scraper de Carátulas",
+        "desc_scraper": "Modifica el texto si la búsqueda automática no encuentra el álbum correcto.",
+        "ph_scraper": "ej. Pink Floyd Dark Side",
+        "btn_cancel": "Cancelar",
+        "msg_scraper_search": "Buscando en la base de datos global...",
+        "msg_scraper_no_res": "No se encontraron resultados. Intenta simplificar el texto (ej. solo Artista y Álbum).",
+        "msg_scraper_err": "Error de red al conectar con la base de datos.",
+        "msg_scraper_down": "Descargando y guardando en el servidor..."
     },
     fr: {
         "tab_player": "Lecteur", "tab_queue": "File d'attente", "tab_favs": "Favoris",
@@ -441,6 +474,17 @@ const translations = {
         "msg_config_saved": "Configuration Enregistrée !",
         "confirm_restore_defaults": "Voulez-vous supprimer la configuration permanente de cet appareil et restaurer les valeurs globales ?",
         "msg_save_error": "Erreur lors de l'enregistrement.",
-        "msg_restore_error": "Erreur lors de la restauration."
+        "msg_restore_error": "Erreur lors de la restauration.",
+
+        "ctx_change_cover": "Charger une image locale",
+        "ctx_search_web": "Chercher une pochette sur le Web",
+        "lbl_scraper_title": "Scraper de Pochettes",
+        "desc_scraper": "Modifiez le texte si la recherche automatique ne trouve pas le bon album.",
+        "ph_scraper": "ex. Pink Floyd Dark Side",
+        "btn_cancel": "Annuler",
+        "msg_scraper_search": "Recherche dans la base de données mondiale...",
+        "msg_scraper_no_res": "Aucun résultat trouvé. Essayez de simplifier le texte (ex. juste Artiste et Album).",
+        "msg_scraper_err": "Erreur réseau lors de la connexion à la base de données.",
+        "msg_scraper_down": "Téléchargement et enregistrement sur le serveur..."
     }
 };

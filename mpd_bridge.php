@@ -183,7 +183,7 @@ try {
         exit;
     }
 
-    if ($action === 'sys_optimize') {
+    else if ($action === 'sys_optimize') {
         $mode = $_GET['mode'] ?? 'startup';
 
         if ($mode === 'startup') {
@@ -197,7 +197,7 @@ try {
         exit;
     }
 
-    if ($action === 'get_default_settings') {
+    else if ($action === 'get_default_settings') {
         clearstatcache();
         if (file_exists(HIFI_DEFAULT_SETTINGS)) {
             $settings = json_decode(file_get_contents(HIFI_DEFAULT_SETTINGS), true);
@@ -212,11 +212,28 @@ try {
         exit;
     }
 
-    if ($action === 'set_default_settings') {
+    else if ($action === 'set_default_settings') {
         $json = file_get_contents('php://input');
         $data = json_decode($json, true);
-        // --- GESTIONE CONFIGURAZIONI CLIENT SPECIFICHE ---
-    if ($action === 'save_client_settings') {
+        if ($data !== null) {
+            if (!is_dir(HIFI_CACHE_DIR)) {
+                @mkdir(HIFI_CACHE_DIR, 0775, true);
+            }
+            if (file_put_contents(HIFI_DEFAULT_SETTINGS, json_encode($data, JSON_PRETTY_PRINT))) {
+                echo json_encode(['success' => true]);
+                exit;
+            } else {
+                echo json_encode(['success' => false, 'error' => 'Impossibile scrivere il file.']);
+                exit;
+            }
+        } else {
+            echo json_encode(['success' => false, 'error' => 'Payload JSON non valido.']);
+            exit;
+        }
+    }
+
+    // --- GESTIONE CONFIGURAZIONI CLIENT SPECIFICHE (Corretto Bug Nesting) ---
+    else if ($action === 'save_client_settings') {
         $json = file_get_contents('php://input');
         $data = json_decode($json, true);
         
@@ -238,7 +255,7 @@ try {
         exit;
     }
 
-    if ($action === 'get_client_settings') {
+    else if ($action === 'get_client_settings') {
         $client_ip = $_SERVER['REMOTE_ADDR'];
         $file = HIFI_CACHE_DIR . '/client_' . md5($client_ip) . '.json';
         
@@ -250,7 +267,7 @@ try {
         exit;
     }
 
-    if ($action === 'delete_client_settings') {
+    else if ($action === 'delete_client_settings') {
         $client_ip = $_SERVER['REMOTE_ADDR'];
         $file = HIFI_CACHE_DIR . '/client_' . md5($client_ip) . '.json';
         
@@ -261,24 +278,7 @@ try {
         exit;
     }
 
-        if ($data !== null) {
-            if (!is_dir(HIFI_CACHE_DIR)) {
-                @mkdir(HIFI_CACHE_DIR, 0775, true);
-            }
-            if (file_put_contents(HIFI_DEFAULT_SETTINGS, json_encode($data, JSON_PRETTY_PRINT))) {
-                echo json_encode(['success' => true]);
-                exit;
-            } else {
-                echo json_encode(['success' => false, 'error' => 'Impossibile scrivere il file.']);
-                exit;
-            }
-        } else {
-            echo json_encode(['success' => false, 'error' => 'Payload JSON non valido.']);
-            exit;
-        }
-    }
-
-    if ($action === 'status') {
+    else if ($action === 'status') {
         $status_raw = send_mpd_command($socket, 'status');
         $song_raw = send_mpd_command($socket, 'currentsong');
 
@@ -1014,8 +1014,77 @@ try {
         echo json_encode(['success' => false, 'error' => 'Upload fallito']);
         exit;
     }
-
+    
+// --- NUOVO MODULO: SCRAPER COPERTINE WEB E SINCRONIZZAZIONE CON MOODE ---
+    else if ($action === 'download_web_cover') {
+        $folder = isset($_GET['folder']) ? $_GET['folder'] : '';
+        $url = isset($_GET['url']) ? $_GET['url'] : '';
+        
+        if (empty($folder) || empty($url)) {
+            echo json_encode(['success' => false, 'error' => 'Parametri mancanti']);
+            exit;
+        }
+        
+        // Pulisce il percorso della cartella da tentativi di injection
+        $cleanFolder = ltrim(str_replace('..', '', $folder), '/');
+        
+        // Cerca di localizzare il percorso fisico assoluto corretto
+        $abs_dir = '/mnt/' . $cleanFolder;
+        if (!is_dir($abs_dir)) {
+            $abs_dir = '/var/lib/mpd/music/' . $cleanFolder;
+        }
+        
+        if (!is_dir($abs_dir)) {
+             echo json_encode(['success' => false, 'error' => 'Cartella ' . $cleanFolder . ' non trovata sul server']);
+             exit;
+        }
+        
+        // Finge di essere un browser normale per aggirare i blocchi anti-bot
+        $options = [
+            "http" => [
+                "header" => "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36\r\n"
+            ]
+        ];
+        $context = stream_context_create($options);
+        $imageData = @file_get_contents($url, false, $context);
+        
+        if (!$imageData) {
+            echo json_encode(['success' => false, 'error' => 'Il server Apple ha rifiutato il download dell\'immagine']);
+            exit;
+        }
+        
+        // PIANO A: Tenta di salvare nella cartella originale della musica (NAS / USB)
+        $coverFile = rtrim($abs_dir, '/') . '/folder.jpg';
+        $result = @file_put_contents($coverFile, $imageData);
+        
+        if ($result !== false) {
+            @chmod($coverFile, 0666);
+            // Lancia lo script di moOde per rigenerare la cache interna
+            exec("php /var/www/command/thumb-gen.php > /dev/null 2>&1 &");
+            echo json_encode(['success' => true]);
+        } else {
+            // PIANO B (FALLBACK): La cartella musicale è in sola lettura. Salviamo direttamente nella cache della WebUI!
+            $hash = md5($cleanFolder);
+            $cache_dest = HIFI_CACHE_DIR . '/' . $hash . '.jpg';
+            
+            if (!is_dir(HIFI_CACHE_DIR)) {
+                @mkdir(HIFI_CACHE_DIR, 0775, true);
+            }
+            
+            $cache_result = @file_put_contents($cache_dest, $imageData);
+            
+            if ($cache_result !== false) {
+                // Riuscito! L'interfaccia userà questa cache al prossimo caricamento
+                echo json_encode(['success' => true, 'note' => 'Salvata in cache locale']);
+            } else {
+                echo json_encode(['success' => false, 'error' => 'Permessi negati sia sul NAS che nella Cache locale.']);
+            }
+        }
+        exit;
+    }
 } 
+
+
 catch (\Throwable $e) {
     echo json_encode([
         'success' => false, 
