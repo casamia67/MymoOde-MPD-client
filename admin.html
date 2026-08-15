@@ -29,8 +29,13 @@
             border-radius: 12px;
             border: 1px solid rgba(255,255,255,0.05);
         }
-        .header-admin h1 { margin-top: 0; color: #fff; display: flex; justify-content: center; align-items: center; gap: 15px;}
-        .header-admin p { color: #aaa; margin-bottom: 0; font-size: 1.1rem; }
+        .header-admin h1 { 
+            margin-top: 0; color: #fff; display: flex; 
+            justify-content: center; align-items: center; gap: 15px;
+        }
+        .header-admin p { 
+            color: #aaa; margin-bottom: 0; font-size: 1.1rem; 
+        }
         
         .label-grid {
             display: grid; 
@@ -43,20 +48,17 @@
             flex-direction: column;
         }
         .label-grid label {
-            margin-top: 0;
-            margin-bottom: 5px;
-            color: #fff;
-            font-size: 0.85rem;
-            font-weight: normal;
+            margin-top: 0; margin-bottom: 5px;
+            color: #fff; font-size: 0.85rem; font-weight: normal;
         }
         .label-grid input {
-            padding: 0.6rem;
-            font-size: 0.9rem;
+            padding: 0.6rem; font-size: 0.9rem;
         }
     </style>
 </head>
 <body class="theme-default">
 
+    <!-- SFONDI DINAMICI -->
     <div id="dynamicBackground" style="background-image: radial-gradient(circle at 50% 30%, var(--hl-color) 0%, #000 80%); z-index: 0;"></div>
     <div id="overlayGradient"></div>
 
@@ -64,7 +66,7 @@
         
         <div class="header-admin">
             <h1><i class="bi bi-sliders"></i> Pannello di Servizio Globale</h1>
-            <p>Configura i valori iniziali che verranno assegnati automaticamente a qualsiasi nuovo dispositivo che apre l'interfaccia per la prima volta.</p>
+            <p>Configura i valori iniziali che verranno assegnati automaticamente a qualsiasi nuovo dispositivo.</p>
         </div>
 
         <div class="settings-grid">
@@ -126,6 +128,8 @@
                 </div>
                 
                 <label style="margin-top: 1.5rem;">Opzioni UI e Motore Grafico</label>
+                
+                <!-- Interruttori UI -->
                 <div class="simple-switch-wrapper" style="margin-bottom: 0.5rem; padding: 6px 10px;">
                     <span style="font-size: 12px; color: #fff;">VU Meter nel Player Integrato</span>
                     <label class="simple-switch"><input type="checkbox" id="defInlineVu"><span class="slider"></span></label>
@@ -155,6 +159,7 @@
             <!-- BLOCCO 2: CONNESSIONI E INDIRIZZI -->
             <div class="settings-card" style="flex: 1 1 100%;">
                 <h3><i class="bi bi-hdd-network"></i> Indirizzi di Rete e Integrazioni</h3>
+                
                 <label>CamillaDSP WebSocket URI (Per l'elaborazione del segnale)</label>
                 <input type="text" id="defWsUri" placeholder="es. ws://192.168.1.50:1234">
                 <div class="hint" style="font-size: 0.75rem; color: #888; margin-top: 4px;">Lascia vuoto per far sì che il client auto-rilevi l'IP del server.</div>
@@ -169,19 +174,19 @@
             <!-- BLOCCO 3: PERSONALIZZAZIONE ETICHETTE -->
             <div class="settings-card" style="flex: 1 1 100%;">
                 <h3><i class="bi bi-fonts"></i> Personalizzazione Etichette (Opzionale)</h3>
-                <p class="hint" style="margin-bottom: 1.5rem; font-size: 0.85rem;">Se desideri sostituire i nomi di fantasia predefiniti con altri nomi o marchi a tua scelta, inseriscili qui sotto. Lasciando il campo vuoto verrà utilizzato il nome di fabbrica dell'interfaccia.</p>
+                <p class="hint" style="margin-bottom: 1.5rem; font-size: 0.85rem;">Se desideri sostituire i nomi di fantasia predefiniti con altri nomi a tua scelta, inseriscili qui sotto. Lasciando il campo vuoto verrà utilizzato il nome di fabbrica dell'interfaccia.</p>
 
                 <h4 style="color: var(--hl-color); margin-top: 5px; margin-bottom: 15px; font-size: 1.05rem;">Hi-Fi Studio Racks (VU Meter)</h4>
                 <div class="label-grid">
-                    <div><label>Blue Classic Mod. 70</label><input type="text" id="lbl_blue_mod70" placeholder="Es. McIntosh"></div>
-                    <div><label>Blue Mono Mod. 1000</label><input type="text" id="lbl_blue_mono_mod1000" placeholder="Es. MC1.25KW"></div>
-                    <div><label>Champagne Gold Mod. 73</label><input type="text" id="lbl_champagne_mod73" placeholder="Es. Accuphase"></div>
-                    <div><label>VFD Peak Mod. 85</label><input type="text" id="lbl_vfd_mod85" placeholder="Es. Technics"></div>
-                    <div><label>Studio Master Mod. 77</label><input type="text" id="lbl_studio_mod77" placeholder="Es. Revox"></div>
-                    <div><label>British Console Mod. 90</label><input type="text" id="lbl_british_mod90" placeholder="Es. Ashdown"></div>
-                    <div><label>Amber Classic Mod. 75</label><input type="text" id="lbl_amber_mod75" placeholder="Es. Luxman"></div>
-                    <div><label>Studio Vintage Mod. 60</label><input type="text" id="lbl_vintage_mod60" placeholder="Es. Vintage"></div>
-                    <div><label>Waves Studio Mod. 99</label><input type="text" id="lbl_waves_mod99" placeholder="Es. Waves"></div>
+                    <div><label>Blue Classic Mod. 70</label><input type="text" id="lbl_blue_mod70" placeholder="Personalizza testo..."></div>
+                    <div><label>Blue Mono Mod. 1000</label><input type="text" id="lbl_blue_mono_mod1000" placeholder="Personalizza testo..."></div>
+                    <div><label>Champagne Gold Mod. 73</label><input type="text" id="lbl_champagne_mod73" placeholder="Personalizza testo..."></div>
+                    <div><label>VFD Peak Mod. 85</label><input type="text" id="lbl_vfd_mod85" placeholder="Personalizza testo..."></div>
+                    <div><label>Studio Master Mod. 77</label><input type="text" id="lbl_studio_mod77" placeholder="Personalizza testo..."></div>
+                    <div><label>British Console Mod. 90</label><input type="text" id="lbl_british_mod90" placeholder="Personalizza testo..."></div>
+                    <div><label>Amber Classic Mod. 75</label><input type="text" id="lbl_amber_mod75" placeholder="Personalizza testo..."></div>
+                    <div><label>Studio Vintage Mod. 60</label><input type="text" id="lbl_vintage_mod60" placeholder="Personalizza testo..."></div>
+                    <div><label>Waves Studio Mod. 99</label><input type="text" id="lbl_waves_mod99" placeholder="Personalizza testo..."></div>
                     <div><label>Dark Meter Mod. 88</label><input type="text" id="lbl_dark_meter_mod88" placeholder="Personalizza testo..."></div>
                     <div><label>Light Meter Mod. 88</label><input type="text" id="lbl_light_meter_mod88" placeholder="Personalizza testo..."></div>
                     <div><label>Cyan Meter Mod. 88</label><input type="text" id="lbl_cyan_meter_mod88" placeholder="Personalizza testo..."></div>
@@ -190,20 +195,20 @@
                     <div><label>Warm Orange Mod. 70</label><input type="text" id="lbl_orange_mod70" placeholder="Personalizza testo..."></div>
                     <div><label>Blue Tube Mod. 50</label><input type="text" id="lbl_tube_mod50" placeholder="Personalizza testo..."></div>
                     <div><label>Minimal Flat Mod. 00</label><input type="text" id="lbl_flat_mod00" placeholder="Personalizza testo..."></div>
-                    <div><label>Touch VU Mod. 15</label><input type="text" id="lbl_touch_mod15" placeholder="Es. piCorePlayer"></div>
+                    <div><label>Touch VU Mod. 15</label><input type="text" id="lbl_touch_mod15" placeholder="Personalizza testo..."></div>
                 </div>
 
                 <h4 style="color: var(--hl-color); margin-top: 10px; margin-bottom: 15px; font-size: 1.05rem;">Vintage 3D Radios</h4>
                 <div class="label-grid">
-                    <div><label>Radica Mod. 58</label><input type="text" id="lbl_radica_mod58" placeholder="Es. Prandoni"></div>
-                    <div><label>Classic '35</label><input type="text" id="lbl_bakelite_mod35" placeholder="Es. Superla"></div>
-                    <div><label>Console '55</label><input type="text" id="lbl_console_mod55" placeholder="Es. Phonola"></div>
-                    <div><label>Teutonia 54</label><input type="text" id="lbl_teutonia_mod54" placeholder="Es. Grundig"></div>
-                    <div><label>Solid State '68</label><input type="text" id="lbl_transistor_mod68" placeholder="Es. Sony"></div>
+                    <div><label>Radica Mod. 58</label><input type="text" id="lbl_radica_mod58" placeholder="Personalizza testo..."></div>
+                    <div><label>Classic '35</label><input type="text" id="lbl_bakelite_mod35" placeholder="Personalizza testo..."></div>
+                    <div><label>Console '55</label><input type="text" id="lbl_console_mod55" placeholder="Personalizza testo..."></div>
+                    <div><label>Teutonia 54</label><input type="text" id="lbl_teutonia_mod54" placeholder="Personalizza testo..."></div>
+                    <div><label>Solid State '68</label><input type="text" id="lbl_transistor_mod68" placeholder="Personalizza testo..."></div>
                     <div><label>Compact 65</label><input type="text" id="lbl_compact_mod65" placeholder="Personalizza testo..."></div>
                 </div>
 
-                <!-- NUOVO: PULSANTE RIPRISTINA NOMI -->
+                <!-- PULSANTE RIPRISTINA NOMI -->
                 <div style="margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem; text-align: right;">
                     <button class="btn-addplay" style="width: auto; display: inline-flex; background: rgba(220,53,69,0.15); color: #ff6b6b; border-color: rgba(220,53,69,0.4); padding: 12px 20px;" onclick="resetCustomLabels()">
                         <i class="bi bi-eraser-fill"></i> Ripristina Etichette di Fabbrica
@@ -231,6 +236,10 @@
         const radioModels = ['radica_mod58', 'bakelite_mod35', 'compact_mod65', 'transistor_mod68', 'console_mod55', 'teutonia_mod54'];
         const allModels = rackModels.concat(radioModels);
 
+        /**
+         * Recupera le impostazioni globali dal backend API e pre-compila
+         * tutti i form, ripristinando anche le etichette in localStorage.
+         */
         async function loadGlobalDefaults() {
             try {
                 let labels = JSON.parse(localStorage.getItem('customLabels') || '{}');
@@ -258,9 +267,15 @@
                     document.getElementById('defStreamUrl').value = d.streamUrl || '';
                     document.getElementById('defMoodeUrl').value = d.moodeUrl || '';
                 }
-            } catch (e) {}
+            } catch (e) {
+                console.error("Errore nel caricamento delle impostazioni predefinite.", e);
+            }
         }
 
+        /**
+         * Costruisce il payload JSON estrapolando i valori dai form
+         * e lo invia al backend per applicare la configurazione a livello server.
+         */
         async function saveGlobalDefaults() {
             let customLabels = {};
             allModels.forEach(m => {
@@ -299,8 +314,11 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-            } catch (e) {}
+            } catch (e) {
+                console.error("Errore nel salvataggio via API.", e);
+            }
             
+            // Animazione di feedback
             btn.innerHTML = '<i class="bi bi-check-circle-fill"></i> Predefiniti e Nomi Salvati!';
             btn.style.background = '#198754';
             btn.style.color = '#fff';
@@ -312,7 +330,10 @@
             }, 3000);
         }
 
-        // NUOVA: Funzione per ripristinare i nomi di fabbrica
+        /**
+         * Cancella forzatamente le customizzazioni delle etichette
+         * ripristinando il comportamento visivo di fabbrica e salvando subito.
+         */
         function resetCustomLabels() {
             if (confirm("Vuoi davvero cancellare tutte le tue etichette personalizzate e tornare ai nomi originali di fabbrica?")) {
                 allModels.forEach(m => {
@@ -320,7 +341,7 @@
                     if (el) el.value = '';
                 });
                 localStorage.removeItem('customLabels');
-                saveGlobalDefaults(); // Salva immediatamente i campi svuotati
+                saveGlobalDefaults(); 
             }
         }
 

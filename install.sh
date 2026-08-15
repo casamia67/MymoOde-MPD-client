@@ -14,7 +14,7 @@ sudo chmod -R 0775 cache
 sudo chown -R www-data:www-data .
 sudo chmod -R 0775 .
 
-# 2. Configurazione log per radiocover_plus.py
+# 2. Configurazione log per script ausiliari Python
 echo "[2/3] Creazione file di log per lo script Python..."
 sudo touch /var/log/moode_radiocover_plus.log
 sudo chmod 666 /var/log/moode_radiocover_plus.log
@@ -30,11 +30,11 @@ sudo wget -q -O bootstrap-icons/fonts/bootstrap-icons.woff2 "https://cdn.jsdeliv
 # Corregge i percorsi nel file CSS per farli puntare alla cartella locale
 sudo sed -i 's/\.\/fonts\//fonts\//g' bootstrap-icons/bootstrap-icons.css
 
-# Assegna i permessi corretti anche alla cartella appena creata
+# Assegna i permessi corretti alla struttura icone
 sudo chown -R www-data:www-data bootstrap-icons
 sudo chmod -R 0775 bootstrap-icons
 
 echo "========================================="
-echo " Setup Completato! "
+echo " Setup Completato!"
 echo " L'interfaccia è pronta e funzionante offline."
 echo "========================================="

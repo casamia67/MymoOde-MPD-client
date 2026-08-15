@@ -10,7 +10,11 @@
 </head>
 <body class="theme-default">
 
-<!-- OSD VOLUME IN SOVRIMPRESSIONE -->
+    <!-- =========================================
+         ELEMENTI DI SFONDO E SOVRIMPRESSIONE
+         ========================================= -->
+         
+    <!-- OSD VOLUME -->
     <div id="volumeOsd" class="volume-osd">
         <i class="bi bi-volume-up-fill" id="volumeOsdIcon"></i>
         <div class="volume-osd-value" id="volumeOsdValue">50%</div>
@@ -19,16 +23,20 @@
         </div>
     </div>
 
+    <!-- SFONDI DINAMICI E GRADIENTI -->
     <div id="dynamicBackground"></div>
     <div id="overlayGradient"></div>
 
+    <!-- OVERLAY DI SINCRONIZZAZIONE -->
     <div id="syncOverlay">
         <i class="bi bi-arrow-clockwise"></i>
         <h2 data-i18n="sync_title">Sincronizzazione in corso...</h2>
         <p data-i18n="sync_desc1">Sto analizzando l'archivio e le copertine sul server.</p>
         <p data-i18n="sync_desc2">Questa operazione può richiedere un paio di minuti.</p>
     </div>
-<div id="screensaverOverlay">
+
+    <!-- OVERLAY SALVASCHERMO 3D -->
+    <div id="screensaverOverlay">
         <div class="mac-faceplate">
             <div class="screw sc-tl"></div><div class="screw sc-tr"></div>
             <div class="screw sc-bl"></div><div class="screw sc-br"></div>
@@ -44,6 +52,7 @@
                     </div>
                 </div>
             </div>
+            
             <div class="hw-controls">
                 <div class="hw-group">
                     <div class="knob-container">
@@ -59,6 +68,7 @@
                         <div class="hw-label" data-i18n="hw_treble">TREBLE</div>
                     </div>
                 </div>
+                
                 <div class="hw-center">
                     <div class="led-bar">
                         <div class="hw-led"></div>
@@ -66,6 +76,7 @@
                     </div>
                     <div class="brand-logo blue_mod70" id="brandLogo">CLASSIC '70</div>
                 </div>
+                
                 <div class="hw-group" style="justify-content: flex-end;">
                     <div class="knob-container">
                         <div class="hw-knob vol" style="transform: rotate(60deg);">
@@ -75,6 +86,7 @@
                     </div>
                 </div>
             </div>
+            
             <div class="rack-feet">
                 <div class="foot"></div>
                 <div class="foot"></div>
@@ -83,54 +95,82 @@
         </div>
     </div>
 
-    <!-- NUOVO: MINI-PLAYER OVERLAY DEL SALVASCHERMO -->
+    <!-- MINI-PLAYER IN OVERLAY DURANTE IL SALVASCHERMO -->
     <div id="ssControlsOverlay" class="ss-controls-overlay" style="opacity: 0; pointer-events: none;">
-        
-        <!-- Pulsante Repeat Salvaschermo -->
         <button class="icon-btn" id="ssBtnRepeat" onclick="resetSsControlsTimer(); sendCmd('repeat', currentRepeat === '1' ? '0' : '1'); event.stopPropagation();" title="Repeat">
             <i class="bi bi-repeat"></i>
         </button>
-
-        <button class="icon-btn" onclick="resetSsControlsTimer(); sendCmd('previous'); event.stopPropagation();"><i class="bi bi-skip-end-fill" style="transform: scaleX(-1); display:inline-block;"></i></button>
-        <button class="icon-btn play-btn" id="ssBtnPlay" onclick="resetSsControlsTimer(); sendCmd('toggle'); event.stopPropagation();"><i class="bi bi-pause-fill"></i></button>
-        <button class="icon-btn" onclick="resetSsControlsTimer(); sendCmd('next'); event.stopPropagation();"><i class="bi bi-skip-end-fill"></i></button>
-        
-        <!-- Pulsante Random Salvaschermo -->
+        <button class="icon-btn" onclick="resetSsControlsTimer(); sendCmd('previous'); event.stopPropagation();">
+            <i class="bi bi-skip-end-fill" style="transform: scaleX(-1); display:inline-block;"></i>
+        </button>
+        <button class="icon-btn play-btn" id="ssBtnPlay" onclick="resetSsControlsTimer(); sendCmd('toggle'); event.stopPropagation();">
+            <i class="bi bi-pause-fill"></i>
+        </button>
+        <button class="icon-btn" onclick="resetSsControlsTimer(); sendCmd('next'); event.stopPropagation();">
+            <i class="bi bi-skip-end-fill"></i>
+        </button>
         <button class="icon-btn" id="ssBtnRandom" onclick="resetSsControlsTimer(); sendCmd('random', currentRandom === '1' ? '0' : '1'); event.stopPropagation();" title="Random">
             <i class="bi bi-shuffle"></i>
         </button>
 
         <div class="ss-divider"></div>
      
-        <!-- PULSANTE DI USCITA -->
         <button id="btnExitScreensaver" onclick="exitScreensaver(); event.stopPropagation();" title="Esci dal Salvaschermo">
             <i class="bi bi-box-arrow-right"></i>
         </button>
     </div>
 
-        <div id="moodeUiOverlay">
-            <button class="close-moode-btn" onclick="closeMoodeUI()">
-                <i class="bi bi-x-circle"></i> <span data-i18n="btn_close_moode">Torna al Rack</span>
-            </button>
-            <iframe id="moodeIframe" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
-        </div>
+    <!-- MOODE NATIVE UI OVERLAY -->
+    <div id="moodeUiOverlay">
+        <button class="close-moode-btn" onclick="closeMoodeUI()">
+            <i class="bi bi-x-circle"></i> <span data-i18n="btn_close_moode">Torna al Rack</span>
+        </button>
+        <iframe id="moodeIframe" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+    </div>
 
+    <!-- AUDIO LOCALE (STREAMING HTTP) -->
     <audio id="localAudioPlayer" preload="none" crossorigin="anonymous"></audio>
     
+    <!-- =========================================
+         BARRA DI NAVIGAZIONE E STRUTTURA A SCHEDE
+         ========================================= -->
     <nav class="navbar">
-        <button class="tab-btn active" onclick="switchTab('nowplaying')"><i class="bi bi-play-fill"></i> <span data-i18n="tab_player">Player</span></button>
-        <button class="tab-btn" onclick="switchTab('queue')"><i class="bi bi-music-note-list"></i> <span data-i18n="tab_queue">Coda</span></button>
-        <button class="tab-btn" onclick="switchTab('favorites')"><i class="bi bi-heart-fill"></i> <span data-i18n="tab_favs">Preferiti</span></button>
-        <button class="tab-btn" onclick="switchTab('playlists')"><i class="bi bi-journal-album"></i> <span data-i18n="tab_playlists">Playlist</span></button>
-        <button class="tab-btn" onclick="switchTab('webradio')"><i class="bi bi-broadcast"></i> <span data-i18n="tab_webradio">Radio</span></button>
-        <button class="tab-btn" onclick="switchTab('folders')"><i class="bi bi-folder2-open"></i> <span data-i18n="tab_folders">File</span></button>
-        <button class="tab-btn" onclick="switchTab('albums')"><i class="bi bi-disc"></i> <span data-i18n="tab_albums">Album</span></button>
-        <button class="tab-btn" onclick="switchTab('artists')"><i class="bi bi-person-lines-fill"></i> <span data-i18n="tab_artists">Artisti</span></button>
-        <button class="tab-btn" onclick="switchTab('search')"><i class="bi bi-search"></i> <span data-i18n="tab_search">Cerca</span></button>
-        <button class="tab-btn" onclick="switchTab('settings')"><i class="bi bi-gear"></i> <span data-i18n="tab_settings">Impost.</span></button>
+        <button class="tab-btn active" onclick="switchTab('nowplaying')">
+            <i class="bi bi-play-fill"></i> <span data-i18n="tab_player">Player</span>
+        </button>
+        <button class="tab-btn" onclick="switchTab('queue')">
+            <i class="bi bi-music-note-list"></i> <span data-i18n="tab_queue">Coda</span>
+        </button>
+        <button class="tab-btn" onclick="switchTab('favorites')">
+            <i class="bi bi-heart-fill"></i> <span data-i18n="tab_favs">Preferiti</span>
+        </button>
+        <button class="tab-btn" onclick="switchTab('playlists')">
+            <i class="bi bi-journal-album"></i> <span data-i18n="tab_playlists">Playlist</span>
+        </button>
+        <button class="tab-btn" onclick="switchTab('webradio')">
+            <i class="bi bi-broadcast"></i> <span data-i18n="tab_webradio">Radio</span>
+        </button>
+        <button class="tab-btn" onclick="switchTab('folders')">
+            <i class="bi bi-folder2-open"></i> <span data-i18n="tab_folders">File</span>
+        </button>
+        <button class="tab-btn" onclick="switchTab('albums')">
+            <i class="bi bi-disc"></i> <span data-i18n="tab_albums">Album</span>
+        </button>
+        <button class="tab-btn" onclick="switchTab('artists')">
+            <i class="bi bi-person-lines-fill"></i> <span data-i18n="tab_artists">Artisti</span>
+        </button>
+        <button class="tab-btn" onclick="switchTab('search')">
+            <i class="bi bi-search"></i> <span data-i18n="tab_search">Cerca</span>
+        </button>
+        <button class="tab-btn" onclick="switchTab('settings')">
+            <i class="bi bi-gear"></i> <span data-i18n="tab_settings">Impost.</span>
+        </button>
     </nav>
 
+    <!-- AREA PRINCIPALE CONTENITORE SCHEDE -->
     <main id="mainArea">
+        
+        <!-- SCHEDA: NOW PLAYING -->
         <div id="tab-nowplaying" class="tab-pane active">
             <div class="premium-player-layout">
                 <div class="player-top-half">
@@ -173,21 +213,33 @@
                             <div class="secondary-controls">
                                 <button class="sec-btn" id="btnLocalStream" onclick="toggleLocalStream()" data-i18n-title="tip_stream" title="Ascolta sul dispositivo"><i class="bi bi-headphones"></i></button>
                                 <button class="sec-btn" onclick="switchTab('queue')" data-i18n-title="tip_queue" title="Vai alla Coda"><i class="bi bi-music-note-list"></i></button>
-                                <div class="volume-control">
-                                    <button class="sec-btn" id="btnMute" onclick="toggleMute()" data-i18n-title="tip_mute" title="Mute/Unmute"><i class="bi bi-volume-up-fill" id="muteIcon"></i></button>
-                                    <input type="range" id="volSlider" min="0" max="100" onchange="setVolume(this.value)">
+
+                            <div class="volume-control">
+                                <button class="sec-btn" id="btnMute" onclick="toggleMute()" data-i18n-title="tip_mute" title="Mute/Unmute"><i class="bi bi-volume-up-fill" id="muteIcon"></i></button>
+                                
+                                <!-- NUOVO CONTROLLO VOLUME A ROTELLA ORIZZONTALE -->
+                                <div class="player-vol-wheel-wrapper" title="Scorri per regolare">
+                                    <div class="player-vol-wheel-recess" id="volWheelContainer">
+                                        <div class="player-vol-wheel-surface" id="volWheelUI"></div>
+                                    </div>
+                                    <div class="player-vol-text"><span id="volKnobText">50</span><span style="font-size:0.6rem; color:#888;">%</span></div>
                                 </div>
+                                
+                                <!-- Slider invisibile -->
+                                <input type="range" id="volSlider" min="0" max="100" style="display:none !important;" onchange="setVolume(this.value)">
                             </div>
+                          </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- CONTENITORE VU METER INTEGRATO NEL PLAYER -->
                 <div class="inline-vu-container" id="inlineVuContainer">
                     <canvas id="inlineVuLeft" class="vu-dual"></canvas>
                     <canvas id="inlineVuRight" class="vu-dual"></canvas>
                     <canvas id="inlineVuSingle" class="vu-single"></canvas>
 
-                    <!-- CONTENITORE PROTETTO KDSI ROUND A 3 COLONNE -->
+                    <!-- COMPONENTE: KDSI ROUND SYSTEM (VALVOLE E DIAL A VISTA) -->
                     <div class="kdsi-scale-wrapper" id="inlineKdsiContainer" style="display: none;">
                         <div class="kdsi-stereo-container">
                             
@@ -216,7 +268,7 @@
                                 </div>
                             </div>
 
-                            <!-- 2. SEZIONE CENTRALE CON CONTROLLI IN ALTO E VALVOLE IN BASSO -->
+                            <!-- 2. SEZIONE CENTRALE (VALVOLE E CONTROLLI) -->
                             <div class="kdsi-center-console">
                                 <div class="kdsi-console-screw kdsi-c-tl"></div>
                                 <div class="kdsi-console-screw kdsi-c-tr"></div>
@@ -224,7 +276,6 @@
                                 <div class="kdsi-console-screw kdsi-c-br"></div>
                                 
                                 <div class="kdsi-console-inner">
-                                    <!-- Controlli di tono in alto -->
                                     <div class="hw-group" style="justify-content: center; gap: 18px; margin-top: 5px;">
                                         <div class="knob-container">
                                             <div class="hw-knob" style="transform: rotate(-35deg);"><div class="hw-marker"></div></div>
@@ -236,19 +287,14 @@
                                         </div>
                                     </div>
 
-                                    <!-- Finestra in vetro con le valvole analogiche -->
                                     <div class="valve-window">
                                         <div class="valve-glass-glare"></div>
                                         <div class="tubes-row">
                                             <div class="vacuum-tube">
-                                                <div class="tube-top-cap"></div>
-                                                <div class="tube-plate"></div>
-                                                <div class="tube-filament"></div>
+                                                <div class="tube-top-cap"></div><div class="tube-plate"></div><div class="tube-filament"></div>
                                             </div>
                                             <div class="vacuum-tube">
-                                                <div class="tube-top-cap"></div>
-                                                <div class="tube-plate"></div>
-                                                <div class="tube-filament"></div>
+                                                <div class="tube-top-cap"></div><div class="tube-plate"></div><div class="tube-filament"></div>
                                             </div>
                                         </div>
                                         <div class="valve-badge">VALVE STAGE</div>
@@ -285,6 +331,8 @@
                 </div>
             </div>
         </div>
+
+        <!-- SCHEDA: CODA RIPRODUZIONE -->
         <div id="tab-queue" class="tab-pane">
             <div class="category-header">
                 <span class="path-display" data-i18n="title_queue_play">Coda di Riproduzione</span>
@@ -296,12 +344,14 @@
             <div class="list-container" id="queueList"></div>
         </div>
         
+        <!-- SCHEDA: LE TUE PLAYLIST -->
         <div id="tab-playlists" class="tab-pane">
             <div class="category-header"><span class="path-display" data-i18n="title_playlists_saved">Le tue Playlist Salvate</span></div>
             <div class="list-container" id="playlistGrid"></div>
             <div class="alpha-filter-container" id="alpha-playlists"></div>
         </div>
 
+        <!-- SCHEDA: WEB RADIO -->
         <div id="tab-webradio" class="tab-pane">
             <div class="category-header">
                 <span class="path-display" data-i18n="lbl_custom_radios">Le tue Web Radio</span>
@@ -342,6 +392,7 @@
             <div class="list-container" id="radioListGrid"></div>
         </div>
 
+        <!-- SCHEDA: FILES E DIRECTORY -->
         <div id="tab-folders" class="tab-pane">
             <div class="category-header">
                 <button class="btn-up" onclick="navFoldersUp()"><i class="bi bi-arrow-90deg-up"></i> <span data-i18n="btn_up">Su</span></button>
@@ -354,6 +405,7 @@
             <div id="folderGrid"></div>
         </div>
         
+        <!-- SCHEDA: I MIEI PREFERITI -->
         <div id="tab-favorites" class="tab-pane">
             <div class="header-bar" style="padding: 1rem; color: var(--hl-color); font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.1);">
                 <i class="bi bi-heart-fill"></i> <span data-i18n="tab_favs">I Miei Preferiti</span>
@@ -363,6 +415,7 @@
             <div id="favoritesGrid" class="grid-container" style="padding-bottom: 80px;"></div>
         </div> 
         
+        <!-- SCHEDA: LIBRERIA ALBUM -->
         <div id="tab-albums" class="tab-pane">
             <div class="category-header">
                 <button class="btn-up" id="albumBackBtn" onclick="navAlbumsUp()" style="display: none;"><i class="bi bi-arrow-90deg-up"></i> <span data-i18n="btn_back">Indietro</span></button>
@@ -371,11 +424,11 @@
                     <i id="albumGrid_icon" class="bi bi-list"></i>
                 </button>
             </div>
-            
             <div class="alpha-filter-container" id="alpha-albums"></div>
             <div id="albumGrid"></div>
         </div>
         
+        <!-- SCHEDA: LIBRERIA ARTISTI -->
         <div id="tab-artists" class="tab-pane">
             <div class="category-header">
                 <button class="btn-up" id="artistBackBtn" onclick="navArtistsUp()" style="display: none;"><i class="bi bi-arrow-90deg-up"></i> <span data-i18n="btn_back">Indietro</span></button>
@@ -384,11 +437,12 @@
                     <i id="artistGrid_icon" class="bi bi-grid-fill"></i>
                 </button>
             </div>
-            
             <div class="alpha-filter-container" id="alpha-artists"></div>
             <div id="artistGrid"></div>
         </div>
-<div id="tab-search" class="tab-pane">
+
+        <!-- SCHEDA: RICERCA E TASTIERA A SCHERMO -->
+        <div id="tab-search" class="tab-pane">
             <div class="category-header">
                 <span class="path-display" data-i18n="lbl_search_engine">Motore di Ricerca</span>
                 <button class="btn-up" onclick="toggleView('searchGrid')" style="padding:0.4rem 0.6rem; margin-left:10px;">
@@ -397,7 +451,6 @@
             </div>
             
             <div class="keyboard">
-                <!-- Aggiunto margin: 0 auto; per forzare la centratura di sicurezza -->
                 <select id="searchType" style="display: block; margin: 0 auto 0.8rem auto; background: rgba(0,0,0,0.5); color: #fff; border: 1px solid rgba(255,255,255,0.1); padding: 0.6rem; border-radius: 6px; font-weight: bold; width: 100%; max-width: 600px; font-size: 1rem; cursor: pointer; outline: none;">
                     <option value="any" data-i18n="search_any">Cerca Ovunque (Tutto)</option>
                     <option value="title" data-i18n="search_title">Solo Brani (Titolo)</option>
@@ -410,7 +463,6 @@
                 
                 <div class="search-display" id="searchInput">_</div>
                 
-                <!-- RIGA NUMERI -->
                 <div class="kb-row">
                     <button class="kb-key" onclick="kbType('1')">1</button>
                     <button class="kb-key" onclick="kbType('2')">2</button>
@@ -423,8 +475,6 @@
                     <button class="kb-key" onclick="kbType('9')">9</button>
                     <button class="kb-key" onclick="kbType('0')">0</button>
                 </div>
-
-                <!-- RIGHE LETTERE -->
                 <div class="kb-row">
                     <button class="kb-key" onclick="kbType('Q')">Q</button>
                     <button class="kb-key" onclick="kbType('W')">W</button>
@@ -462,7 +512,6 @@
                     <button class="kb-key action" style="flex: 1.5;" onclick="kbDel()"><i class="bi bi-backspace"></i></button>
                 </div>
                 
-                <!-- RIGA INFERIORE E CARATTERI SPECIALI -->
                 <div class="kb-row" style="margin-top:0.4rem;">
                     <button class="kb-key action" style="background:rgba(220, 53, 69, 0.5); flex: 1;" onclick="kbClear()"><i class="bi bi-trash3"></i></button>
                     <button class="kb-key" onclick="kbType('-')">-</button>
@@ -477,6 +526,7 @@
             <div id="searchGrid"></div>
         </div>
         
+        <!-- SCHEDA: PANNELLO IMPOSTAZIONI LOCALI -->
         <div id="tab-settings" class="tab-pane">
             <div class="category-header">
                 <span class="path-display" data-i18n="lbl_settings_sys">Pannello di Controllo e Integrazioni</span>
@@ -517,18 +567,18 @@
                 <!-- BLOCCO CONFIGURAZIONE DISPOSITIVO PERMANENTE -->
                 <div class="settings-card">
                     <h3><i class="bi bi-device-ssd"></i> <span data-i18n="hdr_local_device">Configurazione Dispositivo Locale</span></h3>
-                    <p class="hint" style="margin-bottom: 15px; color: #ccc;" data-i18n="desc_local_device">Salva le impostazioni attuali di questo dispositivo sul server tramite il tuo IP. In questo modo la configurazione non verrà mai persa, anche se svuoti la cache o ricarichi la pagina.</p>
+                    <p class="hint" style="margin-bottom: 15px; color: #ccc;" data-i18n="desc_local_device">Salva le impostazioni attuali di questo dispositivo sul server tramite il tuo IP.</p>
                     <div style="display: flex; gap: 10px;">
                         <button id="btnSaveClient" onclick="saveClientSettings()" class="btn-addplay" style="flex:1; background:var(--hl-color); color:#000; border:none; font-weight:bold;">
                             <i class="bi bi-floppy-fill"></i> <span data-i18n="btn_save_client">Salva Configurazione</span>
                         </button>
                         <button onclick="restoreDefaultSettings()" class="btn-addplay" style="flex:1; background:rgba(220,53,69,0.15); color:#ff6b6b; border-color:rgba(220,53,69,0.4);">
-                            <i class="bi bi-arrow-counterclockwise"></i> <span data-i18n="btn_restore_defaults">Ripristina Valori di Default</span>
+                            <i class="bi bi-arrow-counterclockwise"></i> <span data-i18n="btn_restore_defaults">Ripristina Default</span>
                         </button>
                     </div>
                 </div>
  
-                <!-- BLOCCO 1: GESTIONE AUDIO E DSP -->
+                <!-- BLOCCO: DSP & AUDIO -->
                 <div class="settings-card">
                     <h3><i class="bi bi-sliders"></i> <span data-i18n="hdr_dsp">DSP & Audio Processing</span></h3>
                     
@@ -550,10 +600,10 @@
                     <input type="text" id="streamUrlInput" data-i18n-placeholder="ph_stream_url" placeholder="es. http://192.168.1.50:8000/mpd.ogg" onchange="saveSettings()">
                 </div>
 
-                <!-- BLOCCO 2: SMART HOME & API -->
+                <!-- BLOCCO: SMART HOME -->
                 <div class="settings-card">
                     <h3><i class="bi bi-house-gear-fill"></i> <span data-i18n="hdr_smart_home">Smart Home (HA / Alexa)</span></h3>
-                    <div class="hint" style="margin-bottom: 0.8rem; color: #ccc;" data-i18n="desc_smart_home">Usa questi Endpoint nei tuoi rest_command di Home Assistant per controllare il rack tramite voce.</div>
+                    <div class="hint" style="margin-bottom: 0.8rem; color: #ccc;" data-i18n="desc_smart_home">Usa questi Endpoint per il controllo vocale.</div>
                     
                     <label data-i18n="lbl_endpoint_search">Endpoint Ricerca Vocale e Play</label>
                     <input type="text" readonly value="/vumeter/mpd_bridge.php?action=search&type=any&q={TESTO}&lang={it|en}&autoplay=true" style="color:#aaa; background:rgba(0,0,0,0.8); cursor:text; font-family:monospace; font-size: 0.8rem;">
@@ -565,11 +615,10 @@
                     <input type="text" id="moodeUiUrlInput" data-i18n-placeholder="ph_moode_url" placeholder="es. http://192.168.1.50" onchange="saveSettings()">
                 </div>
 
-                <!-- BLOCCO 3: ASPETTO E LAYOUT -->
+                <!-- BLOCCO: ASPETTO E LAYOUT -->
                 <div class="settings-card">
                     <h3><i class="bi bi-palette"></i> <span data-i18n="hdr_appearance">Aspetto & Screensaver</span></h3>
                     
-                    <!-- MENU A TENDINA RACK AGGIORNATO CON NOMI SICURI -->
                     <label data-i18n="lbl_vu_style">Modello VU Meter (Tema Globale)</label>
                     <select id="vuStyleSelect" onchange="saveSettings()">
                         <option value="blue_mod70" selected data-i18n="vu_blue_mod70">Blue Classic Mod. 70</option>
@@ -646,18 +695,21 @@
                     <div class="simple-switch-wrapper" style="margin-top: 0.5rem; padding: 6px 10px;">
                         <span style="font-size: 12px; color: #fff;" data-i18n="lbl_mini_player_ss">Mostra Mini Player nel Salvaschermo</span>
                         <label class="simple-switch">
-                        <input type="checkbox" id="miniPlayerSsToggle" onchange="aggiornaMiniPlayerSS()">
-                        <span class="slider"></span>
+                            <input type="checkbox" id="miniPlayerSsToggle" onchange="aggiornaMiniPlayerSS()">
+                            <span class="slider"></span>
                         </label>
                     </div>
                     <div class="simple-switch-wrapper" style="margin-top: 0.5rem; padding: 6px 10px;">
                         <span style="font-size: 12px; color: #fff;" data-i18n="lbl_wake_on_track">Risveglio al cambio brano (Mostra Copertina)</span>
                         <label class="simple-switch">
-                        <input type="checkbox" id="wakeOnTrackToggle" onchange="saveSettings()">
-                        <span class="slider"></span>
+                            <input type="checkbox" id="wakeOnTrackToggle" onchange="saveSettings()">
+                            <span class="slider"></span>
                         </label>
                     </div>
-                    <button onclick="startScreensaver(true);" class="btn-addplay" style="background: var(--hl-color); color: #000; padding: 10px; margin-top: 1rem; border:none;"><i class="bi bi-display"></i> <span data-i18n="btn_test_ss">Prova Screensaver</span></button>
+                    
+                    <button onclick="startScreensaver(true);" class="btn-addplay" style="background: var(--hl-color); color: #000; padding: 10px; margin-top: 1rem; border:none;">
+                        <i class="bi bi-display"></i> <span data-i18n="btn_test_ss">Prova Screensaver</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -666,7 +718,9 @@
     <!-- POPUP MODALE PER WEB SCRAPER COPERTINE -->
     <div id="webCoverModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.9); z-index:100000; align-items:center; justify-content:center; flex-direction:column; padding:20px; backdrop-filter: blur(10px);">
         <div style="background:#1a1a1a; padding:25px; border-radius:12px; width:100%; max-width:900px; border:1px solid #333; box-shadow: 0 20px 50px rgba(0,0,0,1);">
-            <h3 style="margin-top:0; color:var(--hl-color); display:flex; align-items:center; gap:10px;"><i class="bi bi-globe"></i> <span data-i18n="lbl_scraper_title">Scraper Copertine</span></h3>
+            <h3 style="margin-top:0; color:var(--hl-color); display:flex; align-items:center; gap:10px;">
+                <i class="bi bi-globe"></i> <span data-i18n="lbl_scraper_title">Scraper Copertine</span>
+            </h3>
             <p style="color:#aaa; font-size:0.9rem; margin-bottom:15px;" data-i18n="desc_scraper">Modifica il testo se la ricerca automatica non trova l'album corretto.</p>
             
             <div style="display:flex; gap:10px; margin-bottom:20px;">
@@ -675,12 +729,12 @@
                 <button class="btn-addplay" onclick="document.getElementById('webCoverModal').style.display='none'" style="margin:0; width:auto; padding:0 20px; background:rgba(255,255,255,0.1); border-color:#555;" data-i18n="btn_cancel">Annulla</button>
             </div>
             
-            <!-- Griglia dei risultati -->
             <div id="webCoverResults" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(160px, 1fr)); gap:20px; max-height:60vh; overflow-y:auto; padding-right:10px;">
             </div>
         </div>
     </div>
 
+    <!-- MINI PLAYER PER DISPOSITIVI MOBILI -->
     <div id="miniPlayer" onclick="switchTab('nowplaying')">
         <div class="mp-progress-bg"><div class="mp-progress-fill" id="mpProgress"></div></div>
         <div class="mp-cover" id="mpCover"></div>

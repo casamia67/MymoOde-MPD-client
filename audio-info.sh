@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==========================================
-# 1. RECUPERO COMPLETO DEI METADATI & STREAM
+# 1. RECUPERO COMPLETO DEI METADATI E STREAM
 # ==========================================
 SONG_RAW=$(echo -e "currentsong\nclose" | nc localhost 6600)
 STATUS_RAW=$(echo -e "status\nclose" | nc localhost 6600)
@@ -44,31 +44,32 @@ if [ "$IS_STREAM" -eq 1 ]; then
     
     [ -z "$ALBUM" ] && ALBUM="Streaming in Diretta"
     [ -z "$GENRE" ] && GENRE="Radio / Web Stream"
-    [ -z "$TIME" ] && TIME="Live Stream"
+    [ -z "$TIME" ]  && TIME="Live Stream"
 else
     if [ -z "$TITLE" ]; then
         TITLE=$(basename "$FILE")
         ARTIST="Sconosciuto"
     fi
     [ -z "$ALBUM" ] && ALBUM="-"
-    [ -z "$DATE" ] && DATE="-"
+    [ -z "$DATE" ]  && DATE="-"
     [ -z "$GENRE" ] && GENRE="-"
     [ -z "$TRACK" ] && TRACK="-"
-    [ -z "$TIME" ] && TIME="Sconosciuta"
+    [ -z "$TIME" ]  && TIME="Sconosciuta"
 fi
 
-[ -z "$DATE" ] && DATE="-"
+[ -z "$DATE" ]  && DATE="-"
 [ -z "$TRACK" ] && TRACK="-"
 
 STATE_LINE=$(mpc status | sed -n 2p)
 PLAY_STATE=$(echo "$STATE_LINE" | awk '{print $1}' | tr -d '[]')
 
 # ==========================================
-# 4. ANALISI SORGENTE (ffprobe per Stream / MPD Reale per Locali)
+# 4. ANALISI SORGENTE E SPECIFICHE TECNICHE
 # ==========================================
 if [ "$IS_STREAM" -eq 1 ]; then
-    # Web Radio: Analisi tramite ffprobe sull'URL del flusso
+    # Web Radio: Analisi tramite ffprobe
     FFPROBE_OUT=$(ffprobe -v error -select_streams a:0 -show_entries stream=codec_name,sample_rate,channels -show_entries format=bit_rate -of default=noprint_wrappers=1 "$FILE" 2>/dev/null)
+    
     if [ -n "$FFPROBE_OUT" ]; then
         FF_CODEC=$(echo "$FFPROBE_OUT" | grep "codec_name=" | cut -d'=' -f2 | tr '[:lower:]' '[:upper:]')
         FF_RATE=$(echo "$FFPROBE_OUT" | grep "sample_rate=" | cut -d'=' -f2)
@@ -96,7 +97,7 @@ if [ "$IS_STREAM" -eq 1 ]; then
         BITRATE_RAW="$STREAM_BITRATE"
     fi
 else
-    # File Locali: Estrapolazione sicura da estensione e parametri nativi MPD (senza cache di file di testo)
+    # File Locali: Estrapolazione da parametri nativi MPD
     SRC_RAW=$(echo "$SONG_RAW" | grep -i "^format:" | cut -d' ' -f2)
     EXT="${FILE##*.}"
     EXT_UPPER=$(echo "$EXT" | tr '[:lower:]' '[:upper:]')
@@ -120,7 +121,7 @@ else
 fi
 
 # ==========================================
-# 5. ANALISI USCITA AL DAC (Hardware ALSA o MPD Out)
+# 5. ANALISI USCITA AL DAC
 # ==========================================
 MPD_OUT_RAW=$(echo "$STATUS_RAW" | grep "^audio:" | cut -d' ' -f2)
 HW_PARAMS=$(cat /proc/asound/card*/pcm0p/sub0/hw_params 2>/dev/null | head -n 10)
@@ -176,6 +177,7 @@ else
     echo " METADATI BRANO LOCALE (Stato: $PLAY_STATE)"
 fi
 echo "========================================================================="
+
 if [ "$IS_STREAM" -eq 1 ]; then
     echo "Stazione / Nome: ${NAME:-Sconosciuta}"
     echo "Brano in onda:   $TITLE"
@@ -192,6 +194,7 @@ else
     echo "Durata:          $TIME"
     echo "Percorso:        $FILE"
 fi
+
 echo "========================================================================="
 echo " SPECIFICHE TECNICHE AUDIO"
 echo "========================================================================="

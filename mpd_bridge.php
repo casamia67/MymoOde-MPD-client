@@ -6,22 +6,41 @@ header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-cache, must-revalidate');
 
 @ini_set('max_execution_time', '300');
-@ini_set('memory_limit', '512M');
+@ini_set('memory_limit', '256M');
 
 define('HIFI_CACHE_DIR', '/var/www/vumeter/cache');
 define('HIFI_DEFAULT_SETTINGS', '/var/www/vumeter/cache/default_settings.json');
 define('MOODE_DB_PATH', '/var/local/www/db/moode-sqlite3.db');
 
 $action = $_GET['action'] ?? 'status';
-$socket = @fsockopen('127.0.0.1', 6600, $errno, $errstr, 2);
 
-if (!$socket) {
-    echo json_encode(['success' => false, 'error' => 'MPD Offline o Rifiutato']);
-    exit;
+// Definiamo le azioni amministrative che NON hanno bisogno del server audio MPD
+$no_mpd_actions = [
+    'sys_control', 'sys_optimize', 'get_default_settings', 'set_default_settings', 
+    'save_client_settings', 'get_client_settings', 'delete_client_settings', 
+    'set_custom_cover', 'download_web_cover', 'check_first_run', 'install_dependencies'
+];
+
+$socket = null;
+
+// Ci connettiamo a MPD solo se l'azione richiesta ne ha effettivamente bisogno
+if (!in_array($action, $no_mpd_actions)) {
+    $socket = @fsockopen('127.0.0.1', 6600, $errno, $errstr, 2);
+    if (!$socket) {
+        echo json_encode(['success' => false, 'error' => 'MPD Offline o Rifiutato']);
+        exit;
+    }
+    // Consuma la prima riga di benvenuto di MPD
+    fgets($socket);
 }
 
-fgets($socket);
-
+/**
+ * Invia un comando al server MPD tramite socket e ne legge la risposta.
+ *
+ * @param resource $socket Connessione socket attiva.
+ * @param string $command Comando da inviare (es. 'status', 'currentsong').
+ * @return string Risposta grezza dal server MPD.
+ */
 function send_mpd_command($socket, $command) {
     fwrite($socket, $command . "\n");
     $response = '';
@@ -35,6 +54,12 @@ function send_mpd_command($socket, $command) {
     return $response;
 }
 
+/**
+ * Genera il percorso assoluto per un file di cache basato su un hash.
+ *
+ * @param string $key Chiave identificativa (es. percorso della cartella).
+ * @return string Percorso del file JSON generato.
+ */
 function get_cache_file_path($key) {
     if (!is_dir(HIFI_CACHE_DIR)) {
         @mkdir(HIFI_CACHE_DIR, 0775, true);
@@ -42,6 +67,14 @@ function get_cache_file_path($key) {
     return HIFI_CACHE_DIR . '/' . md5($key) . '.json';
 }
 
+/**
+ * Recupera i dati dalla cache se validi, altrimenti esegue la callback per rigenerarli.
+ *
+ * @param string $key Chiave univoca della cache.
+ * @param int $ttl_seconds Tempo di vita della cache in secondi.
+ * @param callable $callback Funzione anonima da eseguire se la cache è scaduta.
+ * @return mixed Dati elaborati (array o object).
+ */
 function get_cached_data($key, $ttl_seconds, $callback) {
     $file = get_cache_file_path($key);
 
@@ -55,6 +88,11 @@ function get_cached_data($key, $ttl_seconds, $callback) {
     return $data;
 }
 
+/**
+ * Instanzia la connessione al database SQLite nativo di moOde.
+ *
+ * @return SQLite3|null Istanza del DB o null se inaccessibile.
+ */
 function get_moode_db() {
     if (file_exists(MOODE_DB_PATH)) {
         $db = new SQLite3(MOODE_DB_PATH);
@@ -64,9 +102,17 @@ function get_moode_db() {
     return null;
 }
 
+/**
+ * Tenta di individuare e restituire l'URL di una copertina in base al percorso file.
+ * Cerca in diverse cartelle di sistema e utilizza l'hash md5 ove necessario.
+ *
+ * @param string $file Percorso del file musicale o URL dello stream.
+ * @return string URL della copertina o stringa vuota se non trovata.
+ */
 function get_cached_cover_url($file) {
     if (empty($file)) return '';
 
+    // Se è già un URL remoto valido, evita elaborazioni
     if (strpos($file, 'http://') === 0 || strpos($file, 'https://') === 0) {
         return '';
     }
@@ -84,12 +130,14 @@ function get_cached_cover_url($file) {
     $is_radio = (strpos($path_upper, 'RADIO') !== false || strpos($path_upper, 'WEBRADIO') !== false);
     $is_playlist = (substr($path_upper, -4) === '.M3U' || substr($path_upper, -4) === '.PLS' || substr($path_upper, -5) === '.M3U8');
 
+    // Gestione Playlist
     if ($is_playlist) {
         if (@file_exists('/var/local/www/imagesw/playlist-covers/' . $file_base . '.jpg')) {
             return '/imagesw/playlist-covers/' . rawurlencode($file_base) . '.jpg';
         }
     }
 
+    // Ricerca diretta in cache (Brani locali)
     if (!$is_radio && !$is_playlist) {
         if (@file_exists('/var/local/www/imagesw/thmcache/' . $hash . '.jpg')) {
             return '/imagesw/thmcache/' . $hash . '.jpg';
@@ -104,6 +152,7 @@ function get_cached_cover_url($file) {
         $abs_dir = '/var/lib/mpd/music/' . $rel_dir;
     }
 
+    // Gestione Loghi Radio (Ricerca Multi-Cartella)
     if ($is_radio) {
         $radio_search_names = [$file_base, basename($file)];
         foreach ($radio_search_names as $r_name) {
@@ -128,6 +177,7 @@ function get_cached_cover_url($file) {
         }
     }
 
+    // Lettura Cartelle Fisiche alla ricerca di file generici (folder.jpg, cover.jpg)
     if (is_dir($abs_dir)) {
         $specific_imgs = [$file_base . '.jpg', $file_base . '.png', $file_base . '.jpeg', $file_base . '.gif', $file_base . '.JPG', $file_base . '.PNG'];
         foreach ($specific_imgs as $s_img) {
@@ -161,7 +211,12 @@ function get_cached_cover_url($file) {
     return '';
 }
 
+// ==========================================
+// ROUTER DEGLI ENDPOINT (GESTIONE AZIONI)
+// ==========================================
 try {
+    
+    // --- CONTROLLO SERVIZI DI SISTEMA ---
     if ($action === 'sys_control') {
         $cmd = $_GET['cmd'] ?? '';
         
@@ -183,6 +238,7 @@ try {
         exit;
     }
 
+    // --- OTTIMIZZAZIONE IN BACKGROUND ---
     else if ($action === 'sys_optimize') {
         $mode = $_GET['mode'] ?? 'startup';
 
@@ -197,6 +253,7 @@ try {
         exit;
     }
 
+    // --- IMPOSTAZIONI GLOBALI ---
     else if ($action === 'get_default_settings') {
         clearstatcache();
         if (file_exists(HIFI_DEFAULT_SETTINGS)) {
@@ -232,7 +289,7 @@ try {
         }
     }
 
-    // --- GESTIONE CONFIGURAZIONI CLIENT SPECIFICHE (Corretto Bug Nesting) ---
+    // --- IMPOSTAZIONI SPECIFICHE CLIENT ---
     else if ($action === 'save_client_settings') {
         $json = file_get_contents('php://input');
         $data = json_decode($json, true);
@@ -278,6 +335,7 @@ try {
         exit;
     }
 
+    // --- STATUS PRINCIPALE NOW PLAYING ---
     else if ($action === 'status') {
         $status_raw = send_mpd_command($socket, 'status');
         $song_raw = send_mpd_command($socket, 'currentsong');
@@ -332,6 +390,7 @@ try {
 
         $coverUrl = $file ? get_cached_cover_url($file) : '';
 
+        // Routine dedicata alle Web Radio (PyScript + DB Fallback)
         if ($is_webradio) {
             $found_cover = false;
             
@@ -504,6 +563,7 @@ try {
         echo json_encode($response);
     }
 
+    // --- RECUPERO LIBRERIE (Radio, Coda, Album, Ecc) ---
     else if ($action === 'radios') {
         $radios = [];
         $folders = ['RADIO', 'WEBRADIO'];
@@ -545,6 +605,7 @@ try {
 
         echo json_encode($radios);
     }
+
     else if ($action === 'radio_recent') {
         $recent_file = '/var/local/www/rb-cache/recently_played.json';
         if (file_exists($recent_file)) {
@@ -738,6 +799,7 @@ try {
         echo json_encode($cover_data);
     }
 
+    // --- MOTORE DI RICERCA ---
     else if ($action === 'search') {
         $raw_query = trim($_GET['q'] ?? '');
         $lang = $_GET['lang'] ?? 'it';
@@ -893,6 +955,7 @@ try {
         echo json_encode($final_results);
     }
 
+    // --- COMANDI DI RIPRODUZIONE ---
     else if ($action === 'command') { 
         $cmd = $_GET['cmd'] ?? '';
         $param = $_GET['param'] ?? '';
@@ -994,6 +1057,7 @@ try {
         }
     }
 
+    // --- UPLOAD COPERTINA MANUALE ---
     else if ($action === 'set_custom_cover') {
         $folder = $_POST['folder'] ?? '';
         
@@ -1015,7 +1079,7 @@ try {
         exit;
     }
     
-// --- NUOVO MODULO: SCRAPER COPERTINE WEB E SINCRONIZZAZIONE CON MOODE ---
+    // --- SCRAPER COPERTINE WEB ---
     else if ($action === 'download_web_cover') {
         $folder = isset($_GET['folder']) ? $_GET['folder'] : '';
         $url = isset($_GET['url']) ? $_GET['url'] : '';
@@ -1025,10 +1089,8 @@ try {
             exit;
         }
         
-        // Pulisce il percorso della cartella da tentativi di injection
         $cleanFolder = ltrim(str_replace('..', '', $folder), '/');
         
-        // Cerca di localizzare il percorso fisico assoluto corretto
         $abs_dir = '/mnt/' . $cleanFolder;
         if (!is_dir($abs_dir)) {
             $abs_dir = '/var/lib/mpd/music/' . $cleanFolder;
@@ -1039,7 +1101,6 @@ try {
              exit;
         }
         
-        // Finge di essere un browser normale per aggirare i blocchi anti-bot
         $options = [
             "http" => [
                 "header" => "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36\r\n"
@@ -1053,17 +1114,16 @@ try {
             exit;
         }
         
-        // PIANO A: Tenta di salvare nella cartella originale della musica (NAS / USB)
+        // Piano A: Salvataggio fisico nella cartella
         $coverFile = rtrim($abs_dir, '/') . '/folder.jpg';
         $result = @file_put_contents($coverFile, $imageData);
         
         if ($result !== false) {
             @chmod($coverFile, 0666);
-            // Lancia lo script di moOde per rigenerare la cache interna
             exec("php /var/www/command/thumb-gen.php > /dev/null 2>&1 &");
             echo json_encode(['success' => true]);
         } else {
-            // PIANO B (FALLBACK): La cartella musicale è in sola lettura. Salviamo direttamente nella cache della WebUI!
+            // Piano B: Fallback in Cache Locale
             $hash = md5($cleanFolder);
             $cache_dest = HIFI_CACHE_DIR . '/' . $hash . '.jpg';
             
@@ -1074,7 +1134,6 @@ try {
             $cache_result = @file_put_contents($cache_dest, $imageData);
             
             if ($cache_result !== false) {
-                // Riuscito! L'interfaccia userà questa cache al prossimo caricamento
                 echo json_encode(['success' => true, 'note' => 'Salvata in cache locale']);
             } else {
                 echo json_encode(['success' => false, 'error' => 'Permessi negati sia sul NAS che nella Cache locale.']);
@@ -1083,7 +1142,6 @@ try {
         exit;
     }
 } 
-
 
 catch (\Throwable $e) {
     echo json_encode([
